@@ -3,6 +3,8 @@ import "./TelePage.css";
 import { useEffect, useRef } from "react";
 
 function TelePage() {
+
+
     const previousWidth = useRef(window.innerWidth);
     const rows = 24;
     const columns = 40;
@@ -14,6 +16,39 @@ function TelePage() {
         canvasHeight = canvasWidth / columns * rows * 1.3;
     }
 
+    function gridOperation(x, y, operation, value) {
+        if (operation === "drawChar") {
+            let canvas = document.querySelector(".teleCanvas");
+            let ctx = canvas.getContext("2d");
+            ctx.font = `${canvasHeight / rows}px monospace`;
+            ctx.fillText(value, x * (canvasWidth / columns), (y + 1) * (canvasHeight / rows));
+        }
+    }
+
+    //debug function for grid on canvas
+    function drawCanvasGrid() {
+        let canvas = document.querySelector(".teleCanvas");
+        let ctx = canvas.getContext("2d");
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
+        for (let i = 0; i < canvas.width; i += 16) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, canvas.height);
+            ctx.stroke();
+        }
+        for (let i = 0; i < canvas.height; i += 16) {
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(canvas.width, i);
+            ctx.stroke();
+        }
+    }
+
+    useEffect(() => {
+        gridOperation(5, 5, "drawChar", "A");
+        drawCanvasGrid();
+    }, []);
+    
     function handleResize() {
         if (window.innerWidth < 700) {
             canvasWidth = window.innerWidth * 0.95;
