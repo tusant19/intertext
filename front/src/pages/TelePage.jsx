@@ -8,7 +8,7 @@ function TelePage() {
     const previousWidth = useRef(window.innerWidth);
     const rows = 24;
     const columns = 40;
-    const canvasHeight = useRef(rows * (window.innerHeight / 100));
+    const canvasHeight = useRef(rows * (window.innerHeight / 100) * 2);
     const canvasWidth = useRef(columns * (window.innerWidth / 100));
     const cellWidth = useRef(canvasWidth.current / columns);
     const cellHeight = useRef(canvasHeight.current / rows);
@@ -60,7 +60,7 @@ function TelePage() {
             cellWidth.current = canvasWidth.current / columns;
             cellHeight.current = canvasHeight.current / rows;
         } else {
-            canvasHeight.current = rows * (window.innerHeight / 100);
+            canvasHeight.current = rows * (window.innerHeight / 100) * 2;
             canvasWidth.current = columns * (window.innerWidth / 100);
             cellWidth.current = canvasWidth.current / columns;
             cellHeight.current = canvasHeight.current / rows;
