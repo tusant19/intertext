@@ -16,6 +16,8 @@ function TelePage() {
     if (window.innerWidth < 700) {
         canvasWidth.current = window.innerWidth * 0.95;
         canvasHeight.current = canvasWidth.current / columns * rows * 1.3;
+        cellWidth.current = canvasWidth.current / columns;
+        cellHeight.current = canvasHeight.current / rows;
     }
 
     function gridOperation(x, y, operation, value) {
@@ -53,15 +55,15 @@ function TelePage() {
     
     function handleResize() {
         if (window.innerWidth < 700) {
-            canvasWidth = window.innerWidth * 0.95;
-            canvasHeight = canvasWidth / columns * rows * 1.3;
-            cellWidth.current = canvasWidth / columns;
-            cellHeight.current = canvasHeight / rows;
+            canvasWidth.current = window.innerWidth * 0.95;
+            canvasHeight.current = canvasWidth.current / columns * rows * 1.3;
+            cellWidth.current = canvasWidth.current / columns;
+            cellHeight.current = canvasHeight.current / rows;
         } else {
-            canvasHeight = rows * (window.innerHeight / 100);
-            canvasWidth = columns * (window.innerWidth / 100);
-            cellWidth.current = canvasWidth / columns;
-            cellHeight.current = canvasHeight / rows;
+            canvasHeight.current = rows * (window.innerHeight / 100);
+            canvasWidth.current = columns * (window.innerWidth / 100);
+            cellWidth.current = canvasWidth.current / columns;
+            cellHeight.current = canvasHeight.current / rows;
         }
     }
 
