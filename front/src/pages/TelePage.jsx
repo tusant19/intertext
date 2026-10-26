@@ -86,7 +86,7 @@ function TelePage() {
     return (
         <div className="telePageMain">
             <div className="canvasDiv">
-                <canvas className="teleCanvas" width={canvasWidth} height={canvasHeight}></canvas>
+                <canvas className="teleCanvas" width={canvasWidth.current} height={canvasHeight.current}></canvas>
             </div>
         </div>
     );
