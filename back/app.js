@@ -39,13 +39,21 @@ const getCellsByPageId = db.prepare('SELECT * FROM cells WHERE page_id = ?');
 let exampleExists = getAllPages.get();
 if (!exampleExists) {
   insertPage.run(100, Date.now());
-  insertCell.run(100, 0, 23, 'A', 'blue', 'white');
-  insertCell.run(100, 1, 23, 'B', 'red', 'yellow');
+  insertCell.run(100, 0, 23, 'A', 'blue', 'white'); 
+  insertCell.run(100, 2, 23, 'B', 'red', 'yellow');
 }
 
 app.get('/page/:pagenumber', (req, res) => {
   let cells = getCellsByPageId.all(req.params.pagenumber);
-  res.json(cells);
+  res.json({
+    cells: cells.map(cell => ({
+      x: cell.x,
+      y: cell.y,
+      char: cell.char,
+      bg: cell.bg,
+      charColor: cell.char_color
+    }))
+  });
 });
 
 app.listen(3001, () => {

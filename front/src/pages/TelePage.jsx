@@ -13,6 +13,28 @@ function TelePage() {
     const cellWidth = useRef(canvasWidth.current / columns);
     const cellHeight = useRef(canvasHeight.current / rows);
     const cellsArray = useRef(Array.from({ length: columns }, () => Array.from({ length: rows }, () => ({ char: "", bg: "" }))));
+    const currentPage = useRef(100);
+
+    useEffect(() => {
+        axios.get(`${apiAdress}/page/${currentPage.current}`)
+            .then(response => {
+                gridOperation(0, 24, "setFont", "VT323");
+                const cells = response.data.cells;
+                cells.forEach(cell => {
+                    if (cell.bg != "" && cell.bg != null) {
+                        gridOperation(cell.x, cell.y, "drawBg", cell.bg);
+                    }
+                    if (cell.char != "" && cell.char != null) {
+                        gridOperation(cell.x, cell.y, "drawChar", cell.char, cell.charColor);
+                    }
+                    cellsArray.current[cell.x][cell.y] = {
+                        char: cell.char,
+                        bg: cell.bg,
+                        charColor: cell.charColor
+                    };
+                });
+            });
+    }, [currentPage.current]);
 
     if (window.innerWidth < 700) {
         canvasWidth.current = window.innerWidth * 0.95;
@@ -25,6 +47,9 @@ function TelePage() {
         let canvas = document.querySelector(".teleCanvas");
         let ctx = canvas.getContext("2d");
         if (operation === "drawChar") {;
+            if (value2 === undefined || value2 === null || value2 === "") {
+                value2 = "white"; // Default color
+            }
             ctx.fillStyle = value2;
             ctx.fillText(value, x * (cellWidth.current), (y + 1) * (cellHeight.current));
         }
@@ -74,17 +99,18 @@ function TelePage() {
     useEffect(() => {
         clearCanvas();
         drawCanvasGrid();
-        cellsArray.current[0][23].char = "A";
+        
+        /* cellsArray.current[0][23].char = "A";
         cellsArray.current[0][23].bg = "blue";
         cellsArray.current[0][23].charColor = "white";
         cellsArray.current[1][23].char = "B";
         cellsArray.current[1][23].bg = "red";
         cellsArray.current[1][23].charColor = "yellow";
-        gridOperation(0, 24, "setFont", "VT323");
+        
         gridOperation(0, 23, "drawChar", "A", "white");
         gridOperation(0, 23, "drawBg", "blue");
         gridOperation(1, 23, "drawChar", "B", "yellow");
-        gridOperation(1, 23, "drawBg", "red");
+        gridOperation(1, 23, "drawBg", "red"); */
     }, [canvasWidth.current, canvasHeight.current]);
     
     function handleResize() {
