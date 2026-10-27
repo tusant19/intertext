@@ -37,7 +37,7 @@ function TelePage() {
             }
         }
         if (operation === "setFont") {
-            ctx.font = `${cellHeight.current}px ${value}`;
+            ctx.font = `${cellHeight.current * 1.2}px ${value}`;
         }
     }
 
@@ -72,11 +72,17 @@ function TelePage() {
     useEffect(() => {
         clearCanvas();
         drawCanvasGrid();
-        cellsArray.current[39][23].char = "A";
-        cellsArray.current[39][23].bg = "blue";
-        cellsArray.current[39][23].charColor = "white";
-        gridOperation(39, 23, "drawChar", "A", "white");
-        gridOperation(39, 23, "drawBg", "blue");
+        cellsArray.current[0][23].char = "A";
+        cellsArray.current[0][23].bg = "blue";
+        cellsArray.current[0][23].charColor = "white";
+        cellsArray.current[1][23].char = "B";
+        cellsArray.current[1][23].bg = "red";
+        cellsArray.current[1][23].charColor = "yellow";
+        gridOperation(0, 24, "setFont", "VT323");
+        gridOperation(0, 23, "drawChar", "A", "white");
+        gridOperation(0, 23, "drawBg", "blue");
+        gridOperation(1, 23, "drawChar", "B", "yellow");
+        gridOperation(1, 23, "drawBg", "red");
     }, [canvasWidth.current, canvasHeight.current]);
     
     function handleResize() {
