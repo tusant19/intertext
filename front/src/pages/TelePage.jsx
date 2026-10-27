@@ -1,6 +1,8 @@
 import React from "react";
 import "./TelePage.css";
 import { useEffect, useRef } from "react";
+import axios from 'axios';
+import apiAdress from "../components/apiAdress.js";
 
 function TelePage() {
     const previousWidth = useRef(window.innerWidth);
