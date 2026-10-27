@@ -51,9 +51,13 @@ function TelePage() {
         drawCanvasGrid();
     }, []);
 
-    useEffect(() => {
+    function clearCanvas() {
         let ctx = document.querySelector(".teleCanvas").getContext("2d");
         ctx.clearRect(0, 0, canvasWidth.current, canvasHeight.current);
+    }
+
+    useEffect(() => {
+        clearCanvas();
         drawCanvasGrid();
         gridOperation(39, 23, "drawChar", "A");
     }, [canvasWidth.current, canvasHeight.current]);
@@ -76,7 +80,8 @@ function TelePage() {
         let timer = 0;
         let interval = setInterval(() => {
             timer += 50;
-            if (timer >= 200 && previousWidth.current !== window.innerWidth) {
+            if (timer >= 50 && previousWidth.current !== window.innerWidth) {
+                timer = 0;
                 console.log("resized")
                 previousWidth.current = window.innerWidth;
                 handleResize();
