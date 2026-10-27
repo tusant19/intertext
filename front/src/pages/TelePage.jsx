@@ -10,6 +10,7 @@ function TelePage() {
     const canvasWidth = useRef(columns * (window.innerWidth / 100));
     const cellWidth = useRef(canvasWidth.current / columns);
     const cellHeight = useRef(canvasHeight.current / rows);
+    const cellsArray = useRef(Array.from({ length: columns }, () => Array.from({ length: rows }, () => ({ char: "", bg: "" }))));
 
     if (window.innerWidth < 700) {
         canvasWidth.current = window.innerWidth * 0.95;
@@ -18,12 +19,27 @@ function TelePage() {
         cellHeight.current = canvasHeight.current / rows;
     }
 
-    function gridOperation(x, y, operation, value) {
-        if (operation === "drawChar") {
+    function gridOperation(x, y, operation, value, value2) {
+        if (operation === "drawChar") {;
             let canvas = document.querySelector(".teleCanvas");
             let ctx = canvas.getContext("2d");
             ctx.font = `${cellHeight.current}px monospace`;
+            ctx.fillStyle = value2;
             ctx.fillText(value, x * (cellWidth.current), (y + 1) * (cellHeight.current));
+        }
+        if (operation === "clearCell") {
+            let canvas = document.querySelector(".teleCanvas");
+            let ctx = canvas.getContext("2d");
+            ctx.clearRect(x * (cellWidth.current), y * (cellHeight.current), cellWidth.current, cellHeight.current);
+        }
+        if (operation === "drawBg") {
+            let canvas = document.querySelector(".teleCanvas");
+            let ctx = canvas.getContext("2d");
+            ctx.fillStyle = value;
+            ctx.fillRect(x * (cellWidth.current), y * (cellHeight.current), cellWidth.current, cellHeight.current);
+            if (cellsArray.current[x][y].char !== "") {
+                gridOperation(x, y, "drawChar", cellsArray.current[x][y].char, cellsArray.current[x][y].charColor);
+            }
         }
     }
 
@@ -47,7 +63,6 @@ function TelePage() {
     }
 
     useEffect(() => {
-        gridOperation(39, 23, "drawChar", "A");
         drawCanvasGrid();
     }, []);
 
@@ -59,7 +74,11 @@ function TelePage() {
     useEffect(() => {
         clearCanvas();
         drawCanvasGrid();
-        gridOperation(39, 23, "drawChar", "A");
+        cellsArray.current[39][23].char = "A";
+        cellsArray.current[39][23].bg = "blue";
+        cellsArray.current[39][23].charColor = "white";
+        gridOperation(39, 23, "drawChar", "A", "white");
+        gridOperation(39, 23, "drawBg", "blue");
     }, [canvasWidth.current, canvasHeight.current]);
     
     function handleResize() {
