@@ -20,26 +20,24 @@ function TelePage() {
     }
 
     function gridOperation(x, y, operation, value, value2) {
+        let canvas = document.querySelector(".teleCanvas");
+        let ctx = canvas.getContext("2d");
         if (operation === "drawChar") {;
-            let canvas = document.querySelector(".teleCanvas");
-            let ctx = canvas.getContext("2d");
-            ctx.font = `${cellHeight.current}px monospace`;
             ctx.fillStyle = value2;
             ctx.fillText(value, x * (cellWidth.current), (y + 1) * (cellHeight.current));
         }
         if (operation === "clearCell") {
-            let canvas = document.querySelector(".teleCanvas");
-            let ctx = canvas.getContext("2d");
             ctx.clearRect(x * (cellWidth.current), y * (cellHeight.current), cellWidth.current, cellHeight.current);
         }
         if (operation === "drawBg") {
-            let canvas = document.querySelector(".teleCanvas");
-            let ctx = canvas.getContext("2d");
             ctx.fillStyle = value;
             ctx.fillRect(x * (cellWidth.current), y * (cellHeight.current), cellWidth.current, cellHeight.current);
             if (cellsArray.current[x][y].char !== "") {
                 gridOperation(x, y, "drawChar", cellsArray.current[x][y].char, cellsArray.current[x][y].charColor);
             }
+        }
+        if (operation === "setFont") {
+            ctx.font = `${cellHeight.current}px ${value}`;
         }
     }
 
