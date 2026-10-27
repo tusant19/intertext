@@ -3,8 +3,6 @@ import "./TelePage.css";
 import { useEffect, useRef } from "react";
 
 function TelePage() {
-
-
     const previousWidth = useRef(window.innerWidth);
     const rows = 24;
     const columns = 40;
@@ -49,9 +47,16 @@ function TelePage() {
     }
 
     useEffect(() => {
-        gridOperation(5, 5, "drawChar", "A");
+        gridOperation(39, 23, "drawChar", "A");
         drawCanvasGrid();
     }, []);
+
+    useEffect(() => {
+        let ctx = document.querySelector(".teleCanvas").getContext("2d");
+        ctx.clearRect(0, 0, canvasWidth.current, canvasHeight.current);
+        drawCanvasGrid();
+        gridOperation(39, 23, "drawChar", "A");
+    }, [canvasWidth.current, canvasHeight.current]);
     
     function handleResize() {
         if (window.innerWidth < 700) {
