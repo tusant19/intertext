@@ -21,6 +21,10 @@ function TelePage() {
     const movingHighlightRef = useRef(null);
     const canvasRef = useRef(null);
     const clickedCell = useRef({ x: null, y: null });
+    const textToolActive = useRef(false);
+    const charColorToolActive = useRef(false);
+    const bgToolActive = useRef(false);
+    const textToolRef = useRef(null);
 
     useEffect(() => {
         const socket = io(apiAdress);
@@ -221,6 +225,43 @@ function TelePage() {
         }, 5000);
     }
 
+    // monitor for key press if text tool is active
+    useEffect(() => {
+        function handleKeyPress(event) {
+            if (textToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
+                const char = event.key;
+                gridOperation(clickedCell.current.x, clickedCell.current.y, "drawChar", char, "white");
+                cellsArray.current[clickedCell.current.x][clickedCell.current.y].char = char;
+                cellsArray.current[clickedCell.current.x][clickedCell.current.y].charColor = "white";
+                console.log(`Key pressed: ${char} at cell: ${clickedCell.current.x}, ${clickedCell.current.y}`);
+
+                //send to server
+                axios.put(`${apiAdress}/page/${currentPage.current}/cellchar`, {
+                    x: clickedCell.current.x,
+                    y: clickedCell.current.y,
+                    char: char,
+                    charColor: "white"
+                });
+
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyPress);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyPress);
+        };
+    }, []);
+
+    function toggleTextTool() {
+        textToolActive.current = !textToolActive.current;
+        if (textToolActive.current) {
+            textToolRef.current.style.backgroundColor = "lightblue";
+        } else {
+            textToolRef.current.style.backgroundColor = "lightgray";
+        }
+    }
+
     return (
         <div className="telePageMain">
             <div className="movingHighlightDiv" ref={movingHighlightRef}></div>
@@ -230,7 +271,7 @@ function TelePage() {
                 </div>
                 <div className="toolDiv">
                     <div className="textWriteToolDiv">
-                        <button className="toolButton">Text</button>
+                        <button className="toolButton" ref={textToolRef} onClick={toggleTextTool}>Text</button>
                     </div>
                     <div className="charColorToolDiv">
                         <button className="toolButton">Character Color</button>
@@ -247,4 +288,4 @@ function TelePage() {
     );
 }
 
-export default TelePage
+export default TelePage;
