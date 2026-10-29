@@ -34,9 +34,11 @@ function TelePage() {
     useEffect(() => {
         axios.get(`${apiAdress}/page/${currentPage.current}`)
             .then(response => {
-                gridOperation(0, 24, "setFont", "VT323");
                 const cells = response.data.cells;
                 cells.forEach(cell => {
+                    if (cell.font != "" && cell.font != null) {
+                        gridOperation(cell.x, cell.y, "setFont", cell.font);
+                    }
                     if (cell.bg != "" && cell.bg != null) {
                         gridOperation(cell.x, cell.y, "drawBg", cell.bg);
                     }
@@ -44,6 +46,7 @@ function TelePage() {
                         gridOperation(cell.x, cell.y, "drawChar", cell.char, cell.charColor);
                     }
                     cellsArray.current[cell.x][cell.y] = {
+                        font: cell.font,
                         char: cell.char,
                         bg: cell.bg,
                         charColor: cell.charColor

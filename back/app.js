@@ -30,8 +30,11 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS cells (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     page_id INTEGER,
+    time_created INTEGER,
+    overriden INTEGER,
     x INTEGER,
     y INTEGER,
+    font TEXT,
     char TEXT,
     bg TEXT,
     char_color TEXT
@@ -41,14 +44,14 @@ db.exec(`
 const getAllPages= db.prepare('SELECT * FROM pages');
 const insertPage = db.prepare('INSERT INTO pages (page_number, time_created) VALUES (?, ?)');
 
-const insertCell = db.prepare('INSERT INTO cells (page_id, x, y, char, bg, char_color) VALUES (?, ?, ?, ?, ?, ?)');
-const getCellsByPageId = db.prepare('SELECT * FROM cells WHERE page_id = ?');
+const insertCell = db.prepare('INSERT INTO cells (page_id, time_created, overriden, x, y, font, char, bg, char_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+const getCellsByPageId = db.prepare('SELECT * FROM cells WHERE page_id = ? AND overriden = 0');
 
-let exampleExists = getAllPages.get();
-if (!exampleExists) {
+let exampleExists = getAllPages.get(); 
+if (!exampleExists) { 
   insertPage.run(100, Date.now());
-  insertCell.run(100, 0, 23, 'A', 'blue', 'white'); 
-  insertCell.run(100, 2, 23, 'B', 'red', 'yellow');
+  insertCell.run(100, Date.now(), 0, 0, 23, 'VT323', 'A', 'blue', 'white');
+  insertCell.run(100, Date.now(), 0, 2, 23, 'VT323', 'B', 'red', 'yellow');
 }
 
 io.on('connection', (socket) => {
@@ -65,6 +68,7 @@ app.get('/page/:pagenumber', (req, res) => {
     cells: cells.map(cell => ({
       x: cell.x,
       y: cell.y,
+      font: cell.font,
       char: cell.char,
       bg: cell.bg,
       charColor: cell.char_color
