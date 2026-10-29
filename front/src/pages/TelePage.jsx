@@ -25,6 +25,7 @@ function TelePage() {
     const charColorToolActive = useRef(false);
     const bgToolActive = useRef(false);
     const textToolRef = useRef(null);
+    const coinsRef = useRef(0);
 
     useEffect(() => {
         const socket = io(apiAdress);
@@ -197,8 +198,11 @@ function TelePage() {
 
     useEffect(() => {
         let interval = setInterval(() => {
+            coinsRef.current = coinsRef.current + 1;
+            console.log("coinsRef: " + coinsRef.current);
             setCoins(prevCoins => {
                 if (prevCoins < 500) {
+                    
                     return prevCoins + 1;
                 }
                 return prevCoins;
@@ -254,23 +258,36 @@ function TelePage() {
     useEffect(() => {
         function handleKeyPress(event) {
             if (textToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
-                const char = event.key;
-                console.log(`Key pressed: ${char} at cell: ${clickedCell.current.x}, ${clickedCell.current.y}`);
+                if (coinsRef.current < 1) {
+                    console.log("Not enough coins to type");
+                    return;
+                } else {
+                    const char = event.key;
+                    console.log(`Key pressed: ${char} at cell: ${clickedCell.current.x}, ${clickedCell.current.y}`);
 
-                //send to server
-                axios.put(`${apiAdress}/page/${currentPage.current}/cellchar`, {
-                    x: clickedCell.current.x,
-                    y: clickedCell.current.y,
-                    char: char,
-                    charColor: "black"
-                });
+                    //send to server
+                    axios.put(`${apiAdress}/page/${currentPage.current}/cellchar`, {
+                        x: clickedCell.current.x,
+                        y: clickedCell.current.y,
+                        char: char,
+                        charColor: "black"
+                    });
+                    coinsRef.current = coinsRef.current - 1;
 
-                if (clickedCell.current.x < columns - 1) {
-                    fakeClickCell(clickedCell.current.x + 1, clickedCell.current.y);
-                } else if (clickedCell.current.y < rows - 1) {
-                    fakeClickCell(0, clickedCell.current.y + 1);
+                    setCoins(prevCoins => {
+                        if (prevCoins > 0) {
+                            return prevCoins - 1;
+                        } else {
+                            return prevCoins;
+                        }
+                    });
+
+                    if (clickedCell.current.x < columns - 1) {
+                        fakeClickCell(clickedCell.current.x + 1, clickedCell.current.y);
+                    } else if (clickedCell.current.y < rows - 1) {
+                        fakeClickCell(0, clickedCell.current.y + 1);
+                    }
                 }
-
             }
         }
 
