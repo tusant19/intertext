@@ -3,6 +3,7 @@ import "./TelePage.css";
 import { useEffect, useRef } from "react";
 import axios from 'axios';
 import apiAdress from "../components/apiAdress.js";
+import { io } from "socket.io-client";
 
 function TelePage() {
     const previousWidth = useRef(window.innerWidth);
@@ -14,6 +15,21 @@ function TelePage() {
     const cellHeight = useRef(canvasHeight.current / rows);
     const cellsArray = useRef(Array.from({ length: columns }, () => Array.from({ length: rows }, () => ({ char: "", bg: "" }))));
     const currentPage = useRef(100);
+
+    useEffect(() => {
+        const socket = io(apiAdress);
+
+        function connectToRoom() {
+            socket.emit('joinRoom', currentPage.current);
+        }
+
+        connectToRoom();
+
+        return () => {
+            socket.disconnect();
+        };
+    }, []);
+
 
     useEffect(() => {
         axios.get(`${apiAdress}/page/${currentPage.current}`)

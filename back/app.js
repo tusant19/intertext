@@ -1,11 +1,19 @@
 import express from 'express';
+import { createServer } from 'http';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import Database from 'better-sqlite3'
+import { Server } from 'socket.io';
 
 const db = new Database('database.db');
 
 const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*',
+  }
+});
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -43,6 +51,14 @@ if (!exampleExists) {
   insertCell.run(100, 2, 23, 'B', 'red', 'yellow');
 }
 
+io.on('connection', (socket) => {
+  console.log('connect ' + socket.id);
+  socket.on('joinRoom', (room) => {
+    socket.join(room);
+    console.log('joined page ' + room);
+  });
+});
+
 app.get('/page/:pagenumber', (req, res) => {
   let cells = getCellsByPageId.all(req.params.pagenumber);
   res.json({
@@ -56,6 +72,6 @@ app.get('/page/:pagenumber', (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log('Server is running on port 3001');
+httpServer.listen(3000, () => {
+  console.log('Server is running on port 3000');
 });
