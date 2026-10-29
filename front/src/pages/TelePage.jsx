@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import axios from 'axios';
 import apiAdress from "../components/apiAdress.js";
 import { io } from "socket.io-client";
+import '@fontsource/vt323';
 
 function TelePage() {
     const previousWidth = useRef(window.innerWidth);
@@ -15,6 +16,7 @@ function TelePage() {
     const cellHeight = useRef(canvasHeight.current / rows);
     const cellsArray = useRef(Array.from({ length: columns }, () => Array.from({ length: rows }, () => ({ char: "", bg: "" }))));
     const currentPage = useRef(100);
+    const coins = useRef(0);
 
     useEffect(() => {
         const socket = io(apiAdress);
@@ -34,14 +36,6 @@ function TelePage() {
     useEffect(() => {
         axios.get(`${apiAdress}/page/${currentPage.current}`)
             .then(response => {
-                const font = new FontFace('VT323', 'url(https://fonts.gstatic.com/s/vt323/v16/pxiKyp0ihIEF2isfFJU.woff2)');
-                font.load().then(function (loadedFont) {
-                    document.fonts.add(loadedFont);
-                    console.log('Font loaded');
-                }).catch(function (error) {
-                    console.error('Font failed to load', error);
-                });
-                
                 const cells = response.data.cells;
                 cells.forEach(cell => {
                     if (cell.font != "" && cell.font != null) {
@@ -70,7 +64,7 @@ function TelePage() {
         cellHeight.current = canvasHeight.current / rows;
     }
 
-    function gridOperation(x, y, operation, value, value2) {
+    async function gridOperation(x, y, operation, value, value2) {
         let canvas = document.querySelector(".teleCanvas");
         let ctx = canvas.getContext("2d");
         if (operation === "drawChar") {;
@@ -91,6 +85,8 @@ function TelePage() {
             }
         }
         if (operation === "setFont") {
+            console.log("setting font to " + value);
+            await document.fonts.load(`${cellHeight.current * 1.2}px ${value}`);
             ctx.font = `${cellHeight.current * 1.2}px ${value}`;
         }
     }
@@ -170,6 +166,20 @@ function TelePage() {
             clearInterval(interval);
         };
     }, []);
+
+    useEffect(() => {
+        let interval = setInterval(() => {
+            if (coins.current < 500) {
+                coins.current += 1;
+            }
+            console.log("coins: " + coins.current);
+        }, 1000);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
+            
 
     return (
         <div className="telePageMain">
