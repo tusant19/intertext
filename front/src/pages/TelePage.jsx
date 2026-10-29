@@ -34,6 +34,14 @@ function TelePage() {
     useEffect(() => {
         axios.get(`${apiAdress}/page/${currentPage.current}`)
             .then(response => {
+                const font = new FontFace('VT323', 'url(https://fonts.gstatic.com/s/vt323/v16/pxiKyp0ihIEF2isfFJU.woff2)');
+                font.load().then(function (loadedFont) {
+                    document.fonts.add(loadedFont);
+                    console.log('Font loaded');
+                }).catch(function (error) {
+                    console.error('Font failed to load', error);
+                });
+                
                 const cells = response.data.cells;
                 cells.forEach(cell => {
                     if (cell.font != "" && cell.font != null) {
