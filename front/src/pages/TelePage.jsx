@@ -18,6 +18,9 @@ function TelePage() {
     const cellsArray = useRef(Array.from({ length: columns }, () => Array.from({ length: rows }, () => ({ char: "", bg: "" }))));
     const currentPage = useRef(100);
     const [coins, setCoins] = useState(0);
+    const movingHighlightRef = useRef(null);
+    const canvasRef = useRef(null);
+    const clickedCell = useRef({ x: null, y: null });
 
     useEffect(() => {
         const socket = io(apiAdress);
@@ -117,7 +120,8 @@ function TelePage() {
 
     function clearCanvas() {
         let ctx = document.querySelector(".teleCanvas").getContext("2d");
-        ctx.clearRect(0, 0, canvasWidth.current, canvasHeight.current);
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvasWidth.current, canvasHeight.current);
     }
 
     useEffect(() => {
@@ -191,7 +195,10 @@ function TelePage() {
             const rect = canvas.getBoundingClientRect();
             const x = Math.floor((event.clientX - rect.left) / cellWidth.current);
             const y = Math.floor((event.clientY - rect.top) / cellHeight.current);
-            console.log(`Clicked cell: (${x}, ${y})`);
+            
+            clickedCell.current = { x, y };
+            console.log(`Clicked cell: ${clickedCell.current.x}, ${clickedCell.current.y}`);
+            highlightCell(x, y);
         }
         canvas.addEventListener("click", handleClick);
 
@@ -200,8 +207,23 @@ function TelePage() {
         };
     }, []);
 
+    // add a bloom effect around cell
+    function highlightCell(x, y) {
+        //move the highlight div to the cell coordinates
+        movingHighlightRef.current.style.left = `${canvasRef.current.offsetLeft + x * cellWidth.current}px`;
+        movingHighlightRef.current.style.top = `${canvasRef.current.offsetTop + y * cellHeight.current}px`;
+        movingHighlightRef.current.style.width = `${cellWidth.current}px`;
+        movingHighlightRef.current.style.height = `${cellHeight.current}px`;
+        movingHighlightRef.current.style.display = "block";
+        //wait, clear the highlight
+        setTimeout(() => {
+            movingHighlightRef.current.style.display = "none";
+        }, 5000);
+    }
+
     return (
         <div className="telePageMain">
+            <div className="movingHighlightDiv" ref={movingHighlightRef}></div>
             <div className="toolBarDiv">
                 <div className="coinsDisplay">
                     <p>Insert image here {coins}</p>
@@ -219,7 +241,7 @@ function TelePage() {
                 </div>
             </div>
             <div className="canvasDiv">
-                <canvas className="teleCanvas" width={canvasWidth.current} height={canvasHeight.current}></canvas>
+                <canvas className="teleCanvas" width={canvasWidth.current} height={canvasHeight.current} ref={canvasRef}></canvas>
             </div>
         </div>
     );
