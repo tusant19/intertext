@@ -6,3 +6,38 @@
     width: 100dvw;
     height: 100dvh;
 }
+
+.toolBarDiv {
+    display: flex;
+    flex-direction: row;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.toolDiv {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.toolButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 1vh;
+    padding-left: 2vw;
+    padding-right: 2vw;
+    margin-right: 0.5vw;
+    margin-left: 0.5vw;
+    border-radius: 2vh;
+    border: none;
+}

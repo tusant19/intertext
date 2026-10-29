@@ -5,6 +5,7 @@ import axios from 'axios';
 import apiAdress from "../components/apiAdress.js";
 import { io } from "socket.io-client";
 import '@fontsource/vt323';
+import { useState } from "react";
 
 function TelePage() {
     const previousWidth = useRef(window.innerWidth);
@@ -16,7 +17,7 @@ function TelePage() {
     const cellHeight = useRef(canvasHeight.current / rows);
     const cellsArray = useRef(Array.from({ length: columns }, () => Array.from({ length: rows }, () => ({ char: "", bg: "" }))));
     const currentPage = useRef(100);
-    const coins = useRef(0);
+    const [coins, setCoins] = useState(0);
 
     useEffect(() => {
         const socket = io(apiAdress);
@@ -169,10 +170,12 @@ function TelePage() {
 
     useEffect(() => {
         let interval = setInterval(() => {
-            if (coins.current < 500) {
-                coins.current += 1;
-            }
-            console.log("coins: " + coins.current);
+            setCoins(prevCoins => {
+                if (prevCoins < 500) {
+                    return prevCoins + 1;
+                }
+                return prevCoins;
+            });
         }, 1000);
 
         return () => {
@@ -181,8 +184,40 @@ function TelePage() {
     }, []);
             
 
+    //listen for click on canvas and get cell coordinates
+    useEffect(() => {
+        const canvas = document.querySelector(".teleCanvas");
+        function handleClick(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((event.clientX - rect.left) / cellWidth.current);
+            const y = Math.floor((event.clientY - rect.top) / cellHeight.current);
+            console.log(`Clicked cell: (${x}, ${y})`);
+        }
+        canvas.addEventListener("click", handleClick);
+
+        return () => {
+            canvas.removeEventListener("click", handleClick);
+        };
+    }, []);
+
     return (
         <div className="telePageMain">
+            <div className="toolBarDiv">
+                <div className="coinsDisplay">
+                    <p>Insert image here {coins}</p>
+                </div>
+                <div className="toolDiv">
+                    <div className="textWriteToolDiv">
+                        <button className="toolButton">Text</button>
+                    </div>
+                    <div className="charColorToolDiv">
+                        <button className="toolButton">Character Color</button>
+                    </div>
+                    <div className="bgToolDiv">
+                        <button className="toolButton">Background</button>
+                    </div>
+                </div>
+            </div>
             <div className="canvasDiv">
                 <canvas className="teleCanvas" width={canvasWidth.current} height={canvasHeight.current}></canvas>
             </div>
