@@ -37,15 +37,15 @@ function TelePage() {
         axios.get(`${apiAdress}/page/${currentPage.current}`)
             .then(response => {
                 const cells = response.data.cells;
-                cells.forEach(cell => {
+                cells.forEach(async (cell) => {
                     if (cell.font != "" && cell.font != null) {
-                        gridOperation(cell.x, cell.y, "setFont", cell.font);
+                        await gridOperation(cell.x, cell.y, "setFont", cell.font);
                     }
                     if (cell.bg != "" && cell.bg != null) {
-                        gridOperation(cell.x, cell.y, "drawBg", cell.bg);
+                        await gridOperation(cell.x, cell.y, "drawBg", cell.bg);
                     }
                     if (cell.char != "" && cell.char != null) {
-                        gridOperation(cell.x, cell.y, "drawChar", cell.char, cell.charColor);
+                        await gridOperation(cell.x, cell.y, "drawChar", cell.char, cell.charColor);
                     }
                     cellsArray.current[cell.x][cell.y] = {
                         font: cell.font,
