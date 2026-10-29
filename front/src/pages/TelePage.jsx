@@ -30,8 +30,19 @@ function TelePage() {
         const socket = io(apiAdress);
 
         function connectToRoom() {
-            socket.emit('joinRoom', currentPage.current);
+            socket.emit('joinRoom', "100");
         }
+
+        socket.on('cellCharUpdate', (x, y, char, charColor) => {
+            gridOperation(x, y, "removeChar");
+            console.log(`Received cell update: ${char} at (${x}, ${y}) with color ${charColor}`);
+            gridOperation(x, y, "drawChar", char, charColor);
+            cellsArray.current[x][y] = {
+                ...cellsArray.current[x][y],
+                char: char,
+                charColor: charColor
+            };
+        });
 
         connectToRoom();
 
@@ -39,6 +50,7 @@ function TelePage() {
             socket.disconnect();
         };
     }, []);
+
 
 
     useEffect(() => {
@@ -96,6 +108,13 @@ function TelePage() {
             console.log("setting font to " + value);
             await document.fonts.load(`${cellHeight.current * 1.2}px ${value}`);
             ctx.font = `${cellHeight.current * 1.2}px ${value}`;
+        }
+        if (operation === "removeChar") {
+            cellsArray.current[x][y].char = "";
+            ctx.clearRect(x * (cellWidth.current), y * (cellHeight.current), cellWidth.current, cellHeight.current);
+            if (cellsArray.current[x][y].bg !== "") {
+                gridOperation(x, y, "drawBg", cellsArray.current[x][y].bg);
+            }
         }
     }
 
@@ -225,14 +244,17 @@ function TelePage() {
         }, 5000);
     }
 
+    function fakeClickCell(x, y) {
+        clickedCell.current = { x, y };
+        console.log(`Fake clicked cell: ${clickedCell.current.x}, ${clickedCell.current.y}`);
+        highlightCell(x, y);
+    }
+
     // monitor for key press if text tool is active
     useEffect(() => {
         function handleKeyPress(event) {
             if (textToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
                 const char = event.key;
-                gridOperation(clickedCell.current.x, clickedCell.current.y, "drawChar", char, "white");
-                cellsArray.current[clickedCell.current.x][clickedCell.current.y].char = char;
-                cellsArray.current[clickedCell.current.x][clickedCell.current.y].charColor = "white";
                 console.log(`Key pressed: ${char} at cell: ${clickedCell.current.x}, ${clickedCell.current.y}`);
 
                 //send to server
@@ -240,8 +262,14 @@ function TelePage() {
                     x: clickedCell.current.x,
                     y: clickedCell.current.y,
                     char: char,
-                    charColor: "white"
+                    charColor: "black"
                 });
+
+                if (clickedCell.current.x < columns - 1) {
+                    fakeClickCell(clickedCell.current.x + 1, clickedCell.current.y);
+                } else if (clickedCell.current.y < rows - 1) {
+                    fakeClickCell(0, clickedCell.current.y + 1);
+                }
 
             }
         }

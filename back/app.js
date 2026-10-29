@@ -45,6 +45,7 @@ const getAllPages= db.prepare('SELECT * FROM pages');
 const insertPage = db.prepare('INSERT INTO pages (page_number, time_created) VALUES (?, ?)');
 
 const insertCell = db.prepare('INSERT INTO cells (page_id, time_created, overriden, x, y, font, char, bg, char_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+const markCellOverriden = db.prepare('UPDATE cells SET overriden = 1 WHERE page_id = ? AND x = ? AND y = ?');
 const getCellsByPageId = db.prepare('SELECT * FROM cells WHERE page_id = ? AND overriden = 0');
 
 let exampleExists = getAllPages.get(); 
@@ -74,6 +75,20 @@ app.get('/page/:pagenumber', (req, res) => {
       charColor: cell.char_color
     }))
   });
+});
+
+app.put('/page/:pagenumber/cellchar', (req, res) => {
+  console.log(`cell update ${JSON.stringify(req.body)} for page ${req.params.pagenumber}`);
+  const { x, y, char, charColor } = req.body;
+
+  if (!x || !y || !char || !charColor) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+  markCellOverriden.run(req.params?.pagenumber, x, y);
+  insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, 'VT323', char, 'transparent', charColor);
+
+  io.to("100").emit('cellCharUpdate', x, y, char, charColor);
+  res.sendStatus(200);
 });
 
 httpServer.listen(3000, () => {
