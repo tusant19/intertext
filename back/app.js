@@ -87,7 +87,16 @@ app.put('/page/:pagenumber/cellchar', (req, res) => {
   markCellOverriden.run(req.params?.pagenumber, x, y);
   insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, 'VT323', char, 'transparent', charColor);
 
-  io.to("100").emit('cellCharUpdate', x, y, char, charColor);
+  io.to(req.params?.pagenumber).emit('cellCharUpdate', x, y, char, charColor);
+  res.sendStatus(200);
+});
+
+app.put('/page/:pagenumber/cellclear', (req, res) => {
+  console.log(`cell clear ${JSON.stringify(req.body)} for page ${req.params.pagenumber}`);
+  const { x, y } = req.body;
+  markCellOverriden.run(req.params?.pagenumber, x, y);
+
+  io.to(req.params?.pagenumber).emit('cellClear', x, y);
   res.sendStatus(200);
 });
 

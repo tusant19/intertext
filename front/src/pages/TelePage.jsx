@@ -47,6 +47,16 @@ function TelePage() {
             };
         });
 
+        socket.on('cellClear', (x, y) => {
+            console.log(`Received cell clear at (${x}, ${y})`);
+            gridOperation(x, y, "removeChar");
+            cellsArray.current[x][y] = {
+                ...cellsArray.current[x][y],
+                char: "",
+                charColor: "black"
+            };
+        });
+
         connectToRoom();
 
         return () => {
@@ -209,7 +219,7 @@ function TelePage() {
                 }
                 return prevCoins;
             });
-        }, 1000);
+        }, 100);
 
         return () => {
             clearInterval(interval);
@@ -298,7 +308,7 @@ function TelePage() {
 
     //handle key press for clear tool
     useEffect(() => {
-        function handleKeyPress(event) {
+        function handleClearKeyPress(event) {
             if (clearToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
                 if (coinsRef.current < 1) {
                     console.log("Not enough coins to clear");
@@ -326,7 +336,7 @@ function TelePage() {
             }
         }
 
-        window.addEventListener("keydown", handleKeyPress);
+        window.addEventListener("keydown", handleClearKeyPress);
 
         return () => {
             window.removeEventListener("keydown", handleKeyPress);
