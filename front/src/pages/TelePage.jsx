@@ -291,9 +291,16 @@ function TelePage() {
     // monitor for key press if text tool is active
     useEffect(() => {
         function handleKeyPress(event) {
+            //if page 1 err
+            if (currentPage.current === 1) {
+                setErrMsg("Cannot edit page 1");
+                console.log("Cannot edit page 1");
+                return;
+            }
             if (textToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
                 if (coinsRef.current < 1) {
                     console.log("Not enough coins to type");
+                    setErrMsg("Not enough coins to type");
                     return;
                 } else {
                     const char = event.key;
@@ -303,6 +310,7 @@ function TelePage() {
                     if (currentCharColor.current !== cellsArray.current[clickedCell.current.x][clickedCell.current.y].charColor) {
                         if (coinsRef.current < 2) {
                             console.log("Not enough coins to change character color");
+                            setErrMsg("Not enough coins to change character color");
                             return;
                         } else {
                             coinsRef.current = coinsRef.current - 1;
@@ -349,8 +357,15 @@ function TelePage() {
     //handle key press for clear tool
     useEffect(() => {
         function handleClearKeyPress(event) {
+            //if page 1 err
+            if (currentPage.current === 1) {
+                setErrMsg("Cannot edit page 1");
+                console.log("Cannot edit page 1");
+                return;
+            }
             if (clearToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
                 if (coinsRef.current < 1) {
+                    setErrMsg("Not enough coins to clear");
                     console.log("Not enough coins to clear");
                     return;
                 } else {
@@ -386,8 +401,15 @@ function TelePage() {
     //handle key press for char color tool
     useEffect(() => {
         function handleCharColorKeyPress(event) {
+            //if page 1 err
+            if (currentPage.current === 1) {
+                setErrMsg("Cannot edit page 1");
+                console.log("Cannot edit page 1");
+                return;
+            }
             if (charColorToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
                 if (coinsRef.current < 1) {
+                    setErrMsg("Not enough coins to change character color");
                     console.log("Not enough coins to change character color");
                     return;
                 } else {
@@ -413,9 +435,16 @@ function TelePage() {
     //handle key press for bg color tool
     useEffect(() => {
         function handleBgColorKeyPress(event) {
+            //if page 1 err
+            if (currentPage.current === 1) {
+                setErrMsg("Cannot edit page 1");
+                console.log("Cannot edit page 1");
+                return;
+            }
             if (bgToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
                 if (coinsRef.current < 1) {
                     console.log("Not enough coins to change background color");
+                    setErrMsg("Not enough coins to change background color");
                     return;
                 } else {
                     const bgColor = document.getElementById("bgColorPicker").value;
@@ -544,7 +573,7 @@ function TelePage() {
     function changePageNumber(event) {
         const newPageNumber = parseInt(event.target.value);
         if (isNaN(newPageNumber) || newPageNumber < 1 || newPageNumber > 100000) {
-            console.log("Invalid page number");
+            setErrMsg("Page number must be between 1 and 100k");
             return;
         }
         currentPage.current = newPageNumber;
@@ -584,7 +613,7 @@ function TelePage() {
         console.log(`Background color changed to: ${currentBgColor.current}`);
     }
 
-    function setErrorMessageFunc(message) {
+    function setErrMsg(message) {
         setErrorMessage(message);
         setTimeout(() => {
             setErrorMessage("");
