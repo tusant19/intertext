@@ -280,6 +280,23 @@ function TelePage() {
                     const char = event.key;
                     console.log(`Key pressed: ${char} at cell: ${clickedCell.current.x}, ${clickedCell.current.y}`);
 
+                    //if charcolor not the same take additional coin
+                    if (currentCharColor.current !== cellsArray.current[clickedCell.current.x][clickedCell.current.y].charColor) {
+                        if (coinsRef.current < 2) {
+                            console.log("Not enough coins to change character color");
+                            return;
+                        } else {
+                            coinsRef.current = coinsRef.current - 1;
+                            setCoins(prevCoins => {
+                                if (prevCoins > 0) {
+                                    return prevCoins - 1;
+                                } else {
+                                    return prevCoins;
+                                }
+                            });
+                        }
+                    }
+
                     //send to server
                     axios.put(`${apiAdress}/page/${currentPage.current}/cellchar`, {
                         x: clickedCell.current.x,
@@ -288,6 +305,7 @@ function TelePage() {
                         charColor: currentCharColor.current
                     });
                     coinsRef.current = coinsRef.current - 1;
+
 
                     setCoins(prevCoins => {
                         if (prevCoins > 0) {
