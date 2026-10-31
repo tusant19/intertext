@@ -26,6 +26,8 @@ function TelePage() {
     const bgToolActive = useRef(false);
     const textToolRef = useRef(null);
     const coinsRef = useRef(0);
+    const clearToolRef = useRef(null);
+    const clearToolActive = useRef(false);
 
     useEffect(() => {
         const socket = io(apiAdress);
@@ -292,6 +294,39 @@ function TelePage() {
         }
 
         window.addEventListener("keydown", handleKeyPress);
+    }, []);
+
+    //handle key press for clear tool
+    useEffect(() => {
+        function handleKeyPress(event) {
+            if (clearToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
+                if (coinsRef.current < 1) {
+                    console.log("Not enough coins to clear");
+                    return;
+                } else {
+                    axios.put(`${apiAdress}/page/${currentPage.current}/cellclear`, {
+                        x: clickedCell.current.x,
+                        y: clickedCell.current.y
+                    });
+                    coinsRef.current = coinsRef.current - 1;
+                    setCoins(prevCoins => {
+                        if (prevCoins > 0) {
+                            return prevCoins - 1;
+                        } else {
+                            return prevCoins;
+                        }
+                    });
+
+                    if (clickedCell.current.x < columns - 1) {
+                        fakeClickCell(clickedCell.current.x + 1, clickedCell.current.y);
+                    } else if (clickedCell.current.y < rows - 1) {
+                        fakeClickCell(0, clickedCell.current.y + 1);
+                    }
+                }
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyPress);
 
         return () => {
             window.removeEventListener("keydown", handleKeyPress);
@@ -299,6 +334,10 @@ function TelePage() {
     }, []);
 
     function toggleTextTool() {
+        if (isAnyToolActive() && !textToolActive.current) {
+            console.log("Another tool is active, cannot activate text tool");
+            return;
+        }
         textToolActive.current = !textToolActive.current;
         if (textToolActive.current) {
             textToolRef.current.style.backgroundColor = "lightblue";
@@ -306,6 +345,25 @@ function TelePage() {
             textToolRef.current.style.backgroundColor = "lightgray";
         }
     }
+
+    function toggleClearTool() {
+        if (isAnyToolActive() && !clearToolActive.current) {
+            console.log("Another tool is active, cannot activate clear tool");
+            return;
+        }
+        if (clearToolRef.current.style.backgroundColor === "lightgray" || clearToolRef.current.style.backgroundColor === "") {
+            clearToolRef.current.style.backgroundColor = "lightblue";
+            clearToolActive.current = true;
+        } else {
+            clearToolRef.current.style.backgroundColor = "lightgray";
+            clearToolActive.current = false;
+        }
+    }
+
+    function isAnyToolActive() {
+        return textToolActive.current || charColorToolActive.current || bgToolActive.current || clearToolActive.current;
+    }
+
 
     return (
         <div className="telePageMain">
@@ -317,6 +375,9 @@ function TelePage() {
                 <div className="toolDiv">
                     <div className="textWriteToolDiv">
                         <button className="toolButton" ref={textToolRef} onClick={toggleTextTool}>Text</button>
+                    </div>
+                    <div className="clearToolDiv">
+                        <button className="toolButton" ref={clearToolRef} onClick={toggleClearTool}>Clear</button>
                     </div>
                     <div className="charColorToolDiv">
                         <button className="toolButton">Character Color</button>
