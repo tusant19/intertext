@@ -31,6 +31,7 @@ function TelePage() {
     const charColorToolRef = useRef(null);
     const bgToolRef = useRef(null);
     const currentCharColor = useRef("#000000");
+    const currentBgColor = useRef("#ffffff");
 
     useEffect(() => {
         const socket = io(apiAdress);
@@ -503,6 +504,15 @@ function TelePage() {
         }
     }
 
+    function handleCharColorChange(event) {
+        currentCharColor.current = event.target.value;
+        console.log(`Character color changed to: ${currentCharColor.current}`);
+    }
+
+    function handleBgColorChange(event) {
+        currentBgColor.current = event.target.value;
+        console.log(`Background color changed to: ${currentBgColor.current}`);
+    }
 
     return (
         <div className="telePageMain">
@@ -528,9 +538,9 @@ function TelePage() {
             </div>
             <div className="colorPickerDiv">
                 <p>Character Color</p>
-                <input type="color" id="charColorPicker" name="charColorPicker" value="#000000"/>
+                <input type="color" id="charColorPicker" name="charColorPicker" onChange={handleCharColorChange} />
                 <p>Background Color</p>
-                <input type="color" id="bgColorPicker" name="bgColorPicker" value="#ffffff"/>
+                <input type="color" id="bgColorPicker" name="bgColorPicker" onChange={handleBgColorChange}/>
             </div>
             <div className="canvasDiv">
                 <canvas className="teleCanvas" width={canvasWidth.current} height={canvasHeight.current} ref={canvasRef}></canvas>
