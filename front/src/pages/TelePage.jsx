@@ -16,7 +16,7 @@ function TelePage() {
     const cellWidth = useRef(canvasWidth.current / columns);
     const cellHeight = useRef(canvasHeight.current / rows);
     const cellsArray = useRef(Array.from({ length: columns }, () => Array.from({ length: rows }, () => ({ char: "", bg: "" }))));
-    const currentPage = useRef(100);
+    const currentPage = useRef(1);
     const [coins, setCoins] = useState(0);
     const movingHighlightRef = useRef(null);
     const canvasRef = useRef(null);

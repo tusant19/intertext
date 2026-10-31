@@ -47,13 +47,55 @@ const insertPage = db.prepare('INSERT INTO pages (page_number, time_created) VAL
 const insertCell = db.prepare('INSERT INTO cells (page_id, time_created, overriden, x, y, font, char, bg, char_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
 const markCellOverriden = db.prepare('UPDATE cells SET overriden = 1 WHERE page_id = ? AND x = ? AND y = ?');
 const getCellsByPageId = db.prepare('SELECT * FROM cells WHERE page_id = ? AND overriden = 0');
+const getCellByPageIdAndCoordinates = db.prepare('SELECT * FROM cells WHERE page_id = ? AND x = ? AND y = ? AND overriden = 0');
 
-let exampleExists = getAllPages.get(); 
+let exampleExists = getAllPages.get();
 if (!exampleExists) { 
   insertPage.run(100, Date.now());
-  insertCell.run(100, Date.now(), 0, 0, 23, 'VT323', 'A', 'blue', 'white');
+  let prevCell = getCellByPageIdAndCoordinates.get(100, 0, 23);
+  insertCell.run(100, Date.now(), 0, 0, 23, prevCell?.font || 'VT323', 'A', 'blue', 'white');
   insertCell.run(100, Date.now(), 0, 2, 23, 'VT323', 'B', 'red', 'yellow');
 }
+
+const infoPage1inserted = getCellsByPageId.all(1); 
+if (infoPage1inserted.length === 0) {
+  //insert text for page 1 
+  // "welcome to intertext"
+  // "use page browser to switch pages"
+  // "use tools to edit text"
+  const welcomeText = "welcome to intertext";
+  for (let i = 0; i < welcomeText.length; i++) {
+    insertCell.run(1, Date.now(), 0, (i + 3), 2, 'VT323', welcomeText[i], 'transparent', 'white');
+  }
+  const pageBrowserText = "use page browser to switch pages";
+  for (let i = 0; i < pageBrowserText.length; i++) {
+    insertCell.run(1, Date.now(), 0, (i + 3), 6, 'VT323', pageBrowserText[i], 'transparent', 'white');
+  }
+  const toolsText = "use tools to edit text";
+  for (let i = 0; i < toolsText.length; i++) {
+    insertCell.run(1, Date.now(), 0, (i + 3), 10, 'VT323', toolsText[i], 'transparent', 'white');
+  }
+
+  //insert backgrounds for page 1
+  //background for "welcome to intertext" including around it 
+  for (let x = 2; x < welcomeText.length + 5; x++) {
+    for (let y = 1; y < 4; y++) {
+      insertCell.run(1, Date.now(), 0, x, y, 'VT323', '', 'blue', ''); 
+    }
+  }
+  //background for "use page browser to switch pages" including around it 
+  for (let x = 2; x < pageBrowserText.length + 5; x++) {
+    for (let y = 5; y < 8; y++) {
+      insertCell.run(1, Date.now(), 0, x, y, 'VT323', '', 'blue', '');
+    }
+  }
+  //background for "use tools to edit text" including around it 
+  for (let x = 2; x < toolsText.length + 5; x++) {
+    for (let y = 9; y < 12; y++) {
+      insertCell.run(1, Date.now(), 0, x, y, 'VT323', '', 'blue', '');
+    }
+  }
+} 
 
 io.on('connection', (socket) => {
   console.log('connect ' + socket.id);
@@ -78,6 +120,11 @@ app.get('/page/:pagenumber', (req, res) => {
 });
 
 app.put('/page/:pagenumber/cellchar', (req, res) => {
+  //deny if page 1
+  if (req.params?.pagenumber == 1) {
+    return res.status(403).json({ error: 'Cannot edit page 1' });
+  }
+
   console.log(`cell update ${JSON.stringify(req.body)} for page ${req.params.pagenumber}`);
   const { x, y, char, charColor } = req.body;
 
@@ -85,47 +132,63 @@ app.put('/page/:pagenumber/cellchar', (req, res) => {
     return res.status(400).json({ error: 'Missing required fields' });
   }
   markCellOverriden.run(req.params?.pagenumber, x, y);
-  insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, 'VT323', char, 'transparent', charColor);
+  let prevCell = getCellByPageIdAndCoordinates.get(req.params?.pagenumber, x, y);
+  insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, prevCell?.font || 'VT323', char, 'transparent', charColor);
 
   io.to(req.params?.pagenumber).emit('cellCharUpdate', x, y, char, charColor);
   res.sendStatus(200);
 });
 
 app.put('/page/:pagenumber/cellclear', (req, res) => {
+  //deny if page 1
+  if (req.params?.pagenumber == 1) {
+    return res.status(403).json({ error: 'Cannot edit page 1' });
+  }
   console.log(`cell clear ${JSON.stringify(req.body)} for page ${req.params.pagenumber}`);
   const { x, y } = req.body;
   markCellOverriden.run(req.params?.pagenumber, x, y);
 
-  insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, 'VT323', '', 'transparent', 'black');
+  let prevCell = getCellByPageIdAndCoordinates.get(req.params?.pagenumber, x, y);
+  insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, prevCell?.font || 'VT323', '', 'transparent', 'black');
 
   io.to(req.params?.pagenumber).emit('cellClear', x, y);
   res.sendStatus(200);
 }); 
 
 app.put('/page/:pagenumber/cellcharcolor', (req, res) => {
+  //deny if page 1
+  if (req.params?.pagenumber == 1) {
+    return res.status(403).json({ error: 'Cannot edit page 1' });
+  }
   console.log(`cell char color update ${JSON.stringify(req.body)} for page ${req.params.pagenumber}`);
   const { x, y, charColor } = req.body;
 
   if (!x || !y || !charColor) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
+  let prevCell = getCellByPageIdAndCoordinates.get(req.params?.pagenumber, x, y);
 
   markCellOverriden.run(req.params?.pagenumber, x, y);
-  insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, 'VT323', '', 'transparent', charColor);
+  insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, prevCell?.font || 'VT323', prevCell?.char || '', 'transparent', charColor);
 
   io.to(req.params?.pagenumber).emit('cellCharColorUpdate', x, y, charColor);
   res.sendStatus(200);
 });
 
 app.put('/page/:pagenumber/cellbgcolor', (req, res) => {
+  //deny if page 1
+  if (req.params?.pagenumber == 1) {
+    return res.status(403).json({ error: 'Cannot edit page 1' });
+  }
   console.log(`cell bg color update ${JSON.stringify(req.body)} for page ${req.params.pagenumber}`);
   const { x, y, bgColor } = req.body;
 
   if (!x || !y || !bgColor) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
+  let prevCell = getCellByPageIdAndCoordinates.get(req.params?.pagenumber, x, y);
   markCellOverriden.run(req.params?.pagenumber, x, y);
-  insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, 'VT323', '', bgColor, 'black');
+  insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, prevCell?.font || 'VT323', prevCell?.char || '', bgColor, prevCell?.char_color || 'black');
 
   io.to(req.params?.pagenumber).emit('cellBgColorUpdate', x, y, bgColor);
   res.sendStatus(200);
