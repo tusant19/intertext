@@ -32,6 +32,7 @@ function TelePage() {
     const bgToolRef = useRef(null);
     const currentCharColor = useRef("#000000");
     const currentBgColor = useRef("#ffffff");
+    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         const socket = io(apiAdress);
@@ -540,6 +541,39 @@ function TelePage() {
         }
     }
 
+    function changePageNumber(event) {
+        const newPageNumber = parseInt(event.target.value);
+        if (isNaN(newPageNumber) || newPageNumber < 1 || newPageNumber > 100000) {
+            console.log("Invalid page number");
+            return;
+        }
+        currentPage.current = newPageNumber;
+        console.log(`Changing to page number: ${currentPage.current}`);
+        clearCanvas();
+        drawCanvasGrid();
+        axios.get(`${apiAdress}/page/${currentPage.current}`)
+            .then(response => {
+                const cells = response.data.cells;
+                cells.forEach(async (cell) => {
+                    if (cell.font != "" && cell.font != null) {
+                        await gridOperation(cell.x, cell.y, "setFont", cell.font);
+                    }
+                    if (cell.bg != "" && cell.bg != null) {
+                        await gridOperation(cell.x, cell.y, "drawBg", cell.bg);
+                    }
+                    if (cell.char != "" && cell.char != null) {
+                        await gridOperation(cell.x, cell.y, "drawChar", cell.char, cell.charColor);
+                    }
+                    cellsArray.current[cell.x][cell.y] = {
+                        font: cell.font,
+                        char: cell.char,
+                        bg: cell.bg,
+                        charColor: cell.charColor
+                    };
+                });
+            });
+    }
+
     function handleCharColorChange(event) {
         currentCharColor.current = event.target.value;
         console.log(`Character color changed to: ${currentCharColor.current}`);
@@ -548,6 +582,13 @@ function TelePage() {
     function handleBgColorChange(event) {
         currentBgColor.current = event.target.value;
         console.log(`Background color changed to: ${currentBgColor.current}`);
+    }
+
+    function setErrorMessageFunc(message) {
+        setErrorMessage(message);
+        setTimeout(() => {
+            setErrorMessage("");
+        }, 5000);
     }
 
     return (
@@ -577,6 +618,12 @@ function TelePage() {
                 <input type="color" id="charColorPicker" name="charColorPicker" onChange={handleCharColorChange} />
                 <p>Background Color</p>
                 <input type="color" id="bgColorPicker" name="bgColorPicker" onChange={handleBgColorChange}/>
+            </div>
+            <div className="pageNumberDiv">
+                <input type="number" id="pageNumberInput" name="pageNumberInput" min="1" max="100000" defaultValue={currentPage.current} onChange={changePageNumber} />
+            </div>
+            <div className="errorDiv">
+                <p>{errorMessage}</p>
             </div>
             <div className="canvasDiv">
                 <canvas className="teleCanvas" width={canvasWidth.current} height={canvasHeight.current} ref={canvasRef}></canvas>
