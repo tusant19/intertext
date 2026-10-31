@@ -61,6 +61,24 @@ function TelePage() {
             };
         });
 
+        socket.on('cellCharColorUpdate', (x, y, charColor) => {
+            console.log(`Received cell char color update at (${x}, ${y}) with color ${charColor}`);
+            gridOperation(x, y, "drawChar", cellsArray.current[x][y].char, charColor);
+            cellsArray.current[x][y] = {
+                ...cellsArray.current[x][y],
+                charColor: charColor
+            };
+        });
+
+        socket.on('cellBgColorUpdate', (x, y, bgColor) => {
+            console.log(`Received cell bg color update at (${x}, ${y}) with color ${bgColor}`);
+            gridOperation(x, y, "drawBg", bgColor);
+            cellsArray.current[x][y] = {
+                ...cellsArray.current[x][y],
+                bg: bgColor
+            };
+        });
+
         connectToRoom();
 
         return () => {
