@@ -30,6 +30,7 @@ function TelePage() {
     const clearToolActive = useRef(false);
     const charColorToolRef = useRef(null);
     const bgToolRef = useRef(null);
+    const currentCharColor = useRef("#000000");
 
     useEffect(() => {
         const socket = io(apiAdress);
@@ -213,7 +214,6 @@ function TelePage() {
     useEffect(() => {
         let interval = setInterval(() => {
             coinsRef.current = coinsRef.current + 1;
-            console.log("coinsRef: " + coinsRef.current);
             setCoins(prevCoins => {
                 if (prevCoins < 500) {
                     
@@ -221,7 +221,7 @@ function TelePage() {
                 }
                 return prevCoins;
             });
-        }, 100);
+        }, 50);
 
         return () => {
             clearInterval(interval);
@@ -284,7 +284,7 @@ function TelePage() {
                         x: clickedCell.current.x,
                         y: clickedCell.current.y,
                         char: char,
-                        charColor: "black"
+                        charColor: currentCharColor.current
                     });
                     coinsRef.current = coinsRef.current - 1;
 
@@ -341,7 +341,60 @@ function TelePage() {
         window.addEventListener("keydown", handleClearKeyPress);
 
         return () => {
-            window.removeEventListener("keydown", handleKeyPress);
+            window.removeEventListener("keydown", handleClearKeyPress);
+        };
+    }, []);
+
+    //handle key press for char color tool
+    useEffect(() => {
+        function handleCharColorKeyPress(event) {
+            if (charColorToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
+                if (coinsRef.current < 1) {
+                    console.log("Not enough coins to change character color");
+                    return;
+                } else {
+                    const charColor = document.getElementById("charColorPicker").value;
+                    console.log(`Changing character color to: ${charColor} at cell: ${clickedCell.current.x}, ${clickedCell.current.y}`);
+                    currentCharColor.current = charColor;
+                    axios.put(`${apiAdress}/page/${currentPage.current}/cellcharcolor`, {
+                        x: clickedCell.current.x,
+                        y: clickedCell.current.y,
+                        charColor: charColor
+                    });
+                }
+            }
+        }
+
+        window.addEventListener("keydown", handleCharColorKeyPress);
+
+        return () => {
+            window.removeEventListener("keydown", handleCharColorKeyPress);
+        };
+    }, []);
+
+    //handle key press for bg color tool
+    useEffect(() => {
+        function handleBgColorKeyPress(event) {
+            if (bgToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
+                if (coinsRef.current < 1) {
+                    console.log("Not enough coins to change background color");
+                    return;
+                } else {
+                    const bgColor = document.getElementById("bgColorPicker").value;
+                    console.log(`Changing background color to: ${bgColor} at cell: ${clickedCell.current.x}, ${clickedCell.current.y}`);
+                    axios.put(`${apiAdress}/page/${currentPage.current}/cellbgcolor`, {
+                        x: clickedCell.current.x,
+                        y: clickedCell.current.y,
+                        bgColor: bgColor
+                    });
+                }
+            }
+        }
+
+        window.addEventListener("keydown", handleBgColorKeyPress);
+
+        return () => {
+            window.removeEventListener("keydown", handleBgColorKeyPress);
         };
     }, []);
 
@@ -351,11 +404,14 @@ function TelePage() {
             return;
         }
         textToolActive.current = !textToolActive.current;
-        if (textToolActive.current) {
+        if (textToolRef.current.style.backgroundColor != null && textToolRef.current.style.backgroundColor != undefined) {
+             if (textToolActive.current) {
             textToolRef.current.style.backgroundColor = "lightblue";
-        } else {
-            textToolRef.current.style.backgroundColor = "lightgray";
+            } else {
+                textToolRef.current.style.backgroundColor = "#f0f0f0";
+            }
         }
+       
     }
 
     function toggleClearTool() {
@@ -363,11 +419,11 @@ function TelePage() {
             console.log("Another tool is active, cannot activate clear tool");
             return;
         }
-        if (clearToolRef.current.style.backgroundColor === "lightgray" || clearToolRef.current.style.backgroundColor === "") {
+        if (clearToolRef.current.style.backgroundColor === "#f0f0f0" || clearToolRef.current.style.backgroundColor === "") {
             clearToolRef.current.style.backgroundColor = "lightblue";
             clearToolActive.current = true;
         } else {
-            clearToolRef.current.style.backgroundColor = "lightgray";
+            clearToolRef.current.style.backgroundColor = "#f0f0f0";
             clearToolActive.current = false;
         }
     }
@@ -377,11 +433,11 @@ function TelePage() {
             console.log("Another tool is active, cannot activate char color tool");
             return;
         }
-        if (charColorToolRef.current.style.backgroundColor === "lightgray" || charColorToolRef.current.style.backgroundColor === "") {
+        if (charColorToolRef.current.style.backgroundColor === "#f0f0f0" || charColorToolRef.current.style.backgroundColor === "") {
             charColorToolRef.current.style.backgroundColor = "lightblue";
             charColorToolActive.current = true;
         } else {
-            charColorToolRef.current.style.backgroundColor = "lightgray";
+            charColorToolRef.current.style.backgroundColor = "#f0f0f0";
             charColorToolActive.current = false;
         }
     }
@@ -391,11 +447,11 @@ function TelePage() {
             console.log("Another tool is active, cannot activate bg tool");
             return;
         }
-        if (bgToolRef.current.style.backgroundColor === "lightgray" || bgToolRef.current.style.backgroundColor === "") {
+        if (bgToolRef.current.style.backgroundColor === "#f0f0f0" || bgToolRef.current.style.backgroundColor === "") {
             bgToolRef.current.style.backgroundColor = "lightblue";
             bgToolActive.current = true;
         } else {
-            bgToolRef.current.style.backgroundColor = "lightgray";
+            bgToolRef.current.style.backgroundColor = "#f0f0f0";
             bgToolActive.current = false;
         }
     }
@@ -416,7 +472,9 @@ function TelePage() {
     }
 
     function switchTool(tool) {
+        console.log(`Switching to tool: ${tool}`);
         if (isAnyToolActive()) {
+            console.log("Deactivating all tools before switching");
             deactivateAllTools();
         }
         if (tool === "text") {
@@ -440,18 +498,24 @@ function TelePage() {
                 </div>
                 <div className="toolDiv">
                     <div className="textWriteToolDiv">
-                        <button className="toolButton" ref={textToolRef} onClick={toggleTextTool}>Text</button>
+                        <button className="toolButton" ref={textToolRef} onClick={switchTool("text")}>Text</button>
                     </div>
                     <div className="clearToolDiv">
-                        <button className="toolButton" ref={clearToolRef} onClick={toggleClearTool}>Clear</button>
+                        <button className="toolButton" ref={clearToolRef} onClick={switchTool("clear")}>Clear</button>
                     </div>
                     <div className="charColorToolDiv">
-                        <button className="toolButton" ref={charColorToolRef} onClick={toggleCharColorTool}>Character Color</button>
+                        <button className="toolButton" ref={charColorToolRef} onClick={switchTool("charColor")}>Character Color</button>
                     </div>
                     <div className="bgToolDiv">
-                        <button className="toolButton" ref={bgToolRef} onClick={toggleBgTool}>Background</button>
+                        <button className="toolButton" ref={bgToolRef} onClick={switchTool("bg")}>Background</button>
                     </div>
                 </div>
+            </div>
+            <div className="colorPickerDiv">
+                <p>Character Color</p>
+                <input type="color" id="charColorPicker" name="charColorPicker" value="#000000"/>
+                <p>Background Color</p>
+                <input type="color" id="bgColorPicker" name="bgColorPicker" value="#ffffff"/>
             </div>
             <div className="canvasDiv">
                 <canvas className="teleCanvas" width={canvasWidth.current} height={canvasHeight.current} ref={canvasRef}></canvas>
