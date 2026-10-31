@@ -404,14 +404,11 @@ function TelePage() {
             return;
         }
         textToolActive.current = !textToolActive.current;
-        if (textToolRef.current.style.backgroundColor != null && textToolRef.current.style.backgroundColor != undefined) {
-             if (textToolActive.current) {
+        if (textToolActive.current) {
             textToolRef.current.style.backgroundColor = "lightblue";
-            } else {
-                textToolRef.current.style.backgroundColor = "#f0f0f0";
-            }
+        } else {
+            textToolRef.current.style.backgroundColor = "#f0f0f0";
         }
-       
     }
 
     function toggleClearTool() {
@@ -419,12 +416,11 @@ function TelePage() {
             console.log("Another tool is active, cannot activate clear tool");
             return;
         }
-        if (clearToolRef.current.style.backgroundColor === "#f0f0f0" || clearToolRef.current.style.backgroundColor === "") {
+        clearToolActive.current = !clearToolActive.current;
+        if (clearToolActive.current) {
             clearToolRef.current.style.backgroundColor = "lightblue";
-            clearToolActive.current = true;
         } else {
             clearToolRef.current.style.backgroundColor = "#f0f0f0";
-            clearToolActive.current = false;
         }
     }
 
@@ -433,12 +429,11 @@ function TelePage() {
             console.log("Another tool is active, cannot activate char color tool");
             return;
         }
-        if (charColorToolRef.current.style.backgroundColor === "#f0f0f0" || charColorToolRef.current.style.backgroundColor === "") {
+        charColorToolActive.current = !charColorToolActive.current;
+        if (charColorToolActive.current) {
             charColorToolRef.current.style.backgroundColor = "lightblue";
-            charColorToolActive.current = true;
         } else {
             charColorToolRef.current.style.backgroundColor = "#f0f0f0";
-            charColorToolActive.current = false;
         }
     }
 
@@ -447,12 +442,11 @@ function TelePage() {
             console.log("Another tool is active, cannot activate bg tool");
             return;
         }
-        if (bgToolRef.current.style.backgroundColor === "#f0f0f0" || bgToolRef.current.style.backgroundColor === "") {
+        bgToolActive.current = !bgToolActive.current;
+        if (bgToolActive.current) {
             bgToolRef.current.style.backgroundColor = "lightblue";
-            bgToolActive.current = true;
         } else {
             bgToolRef.current.style.backgroundColor = "#f0f0f0";
-            bgToolActive.current = false;
         }
     }
 
@@ -460,26 +454,47 @@ function TelePage() {
         return textToolActive.current || charColorToolActive.current || bgToolActive.current || clearToolActive.current;
     }
     
-    function deactivateAllTools() {
+    async function deactivateAllTools() {
         textToolActive.current = false;
         charColorToolActive.current = false;
         bgToolActive.current = false;
         clearToolActive.current = false;
-        textToolRef.current.style.backgroundColor = "lightgray";
-        clearToolRef.current.style.backgroundColor = "lightgray";
-        charColorToolRef.current.style.backgroundColor = "lightgray";
-        bgToolRef.current.style.backgroundColor = "lightgray";
+        textToolRef.current.style.backgroundColor = "#f0f0f0";
+        clearToolRef.current.style.backgroundColor = "#f0f0f0";
+        charColorToolRef.current.style.backgroundColor = "#f0f0f0";
+        bgToolRef.current.style.backgroundColor = "#f0f0f0";
     }
 
-    function switchTool(tool) {
+    async function switchTool(tool) {
         console.log(`Switching to tool: ${tool}`);
+        if (tool === "text" && textToolActive.current) {
+            console.log("Deactivating text tool");
+            toggleTextTool();
+            return;
+        }
+        if (tool === "clear" && clearToolActive.current) {
+            console.log("Deactivating clear tool");
+            toggleClearTool();
+            return;
+        }
+        if (tool === "charColor" && charColorToolActive.current) {
+            console.log("Deactivating char color tool");
+            toggleCharColorTool();
+            return;
+        }
+        if (tool === "bg" && bgToolActive.current) {
+            console.log("Deactivating bg tool");
+            toggleBgTool();
+            return;
+        }
         if (isAnyToolActive()) {
             console.log("Deactivating all tools before switching");
-            deactivateAllTools();
+            await deactivateAllTools();
         }
         if (tool === "text") {
             toggleTextTool();
         } else if (tool === "clear") {
+            console.log("toggleClearTool called");
             toggleClearTool();
         } else if (tool === "charColor") {
             toggleCharColorTool();
@@ -498,16 +513,16 @@ function TelePage() {
                 </div>
                 <div className="toolDiv">
                     <div className="textWriteToolDiv">
-                        <button className="toolButton" ref={textToolRef} onClick={switchTool("text")}>Text</button>
+                        <button className="toolButton" ref={textToolRef} onClick={() => switchTool("text")}>Text</button>
                     </div>
                     <div className="clearToolDiv">
-                        <button className="toolButton" ref={clearToolRef} onClick={switchTool("clear")}>Clear</button>
+                        <button className="toolButton" ref={clearToolRef} onClick={() => switchTool("clear")}>Clear</button>
                     </div>
                     <div className="charColorToolDiv">
-                        <button className="toolButton" ref={charColorToolRef} onClick={switchTool("charColor")}>Character Color</button>
+                        <button className="toolButton" ref={charColorToolRef} onClick={() => switchTool("charColor")}>Character Color</button>
                     </div>
                     <div className="bgToolDiv">
-                        <button className="toolButton" ref={bgToolRef} onClick={switchTool("bg")}>Background</button>
+                        <button className="toolButton" ref={bgToolRef} onClick={() => switchTool("bg")}>Background</button>
                     </div>
                 </div>
             </div>
