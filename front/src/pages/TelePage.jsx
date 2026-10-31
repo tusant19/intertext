@@ -28,6 +28,8 @@ function TelePage() {
     const coinsRef = useRef(0);
     const clearToolRef = useRef(null);
     const clearToolActive = useRef(false);
+    const charColorToolRef = useRef(null);
+    const bgToolRef = useRef(null);
 
     useEffect(() => {
         const socket = io(apiAdress);
@@ -370,8 +372,62 @@ function TelePage() {
         }
     }
 
+    function toggleCharColorTool() {
+        if (isAnyToolActive() && !charColorToolActive.current) {
+            console.log("Another tool is active, cannot activate char color tool");
+            return;
+        }
+        if (charColorToolRef.current.style.backgroundColor === "lightgray" || charColorToolRef.current.style.backgroundColor === "") {
+            charColorToolRef.current.style.backgroundColor = "lightblue";
+            charColorToolActive.current = true;
+        } else {
+            charColorToolRef.current.style.backgroundColor = "lightgray";
+            charColorToolActive.current = false;
+        }
+    }
+
+    function toggleBgTool() {
+        if (isAnyToolActive() && !bgToolActive.current) {
+            console.log("Another tool is active, cannot activate bg tool");
+            return;
+        }
+        if (bgToolRef.current.style.backgroundColor === "lightgray" || bgToolRef.current.style.backgroundColor === "") {
+            bgToolRef.current.style.backgroundColor = "lightblue";
+            bgToolActive.current = true;
+        } else {
+            bgToolRef.current.style.backgroundColor = "lightgray";
+            bgToolActive.current = false;
+        }
+    }
+
     function isAnyToolActive() {
         return textToolActive.current || charColorToolActive.current || bgToolActive.current || clearToolActive.current;
+    }
+    
+    function deactivateAllTools() {
+        textToolActive.current = false;
+        charColorToolActive.current = false;
+        bgToolActive.current = false;
+        clearToolActive.current = false;
+        textToolRef.current.style.backgroundColor = "lightgray";
+        clearToolRef.current.style.backgroundColor = "lightgray";
+        charColorToolRef.current.style.backgroundColor = "lightgray";
+        bgToolRef.current.style.backgroundColor = "lightgray";
+    }
+
+    function switchTool(tool) {
+        if (isAnyToolActive()) {
+            deactivateAllTools();
+        }
+        if (tool === "text") {
+            toggleTextTool();
+        } else if (tool === "clear") {
+            toggleClearTool();
+        } else if (tool === "charColor") {
+            toggleCharColorTool();
+        } else if (tool === "bg") {
+            toggleBgTool();
+        }
     }
 
 
@@ -390,10 +446,10 @@ function TelePage() {
                         <button className="toolButton" ref={clearToolRef} onClick={toggleClearTool}>Clear</button>
                     </div>
                     <div className="charColorToolDiv">
-                        <button className="toolButton">Character Color</button>
+                        <button className="toolButton" ref={charColorToolRef} onClick={toggleCharColorTool}>Character Color</button>
                     </div>
                     <div className="bgToolDiv">
-                        <button className="toolButton">Background</button>
+                        <button className="toolButton" ref={bgToolRef} onClick={toggleBgTool}>Background</button>
                     </div>
                 </div>
             </div>

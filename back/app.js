@@ -96,6 +96,8 @@ app.put('/page/:pagenumber/cellclear', (req, res) => {
   const { x, y } = req.body;
   markCellOverriden.run(req.params?.pagenumber, x, y);
 
+  insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, 'VT323', '', 'transparent', 'black');
+
   io.to(req.params?.pagenumber).emit('cellClear', x, y);
   res.sendStatus(200);
 });
