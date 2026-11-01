@@ -8,7 +8,6 @@ import '@fontsource/vt323';
 import { useState } from "react";
 
 function TelePage() {
-    const previousWidth = useRef(`${window.innerWidth}x${window.innerHeight}`);
     const rows = 24;
     const columns = 40;
     const canvasWidth = useRef(columns * (window.innerWidth / 100));
@@ -242,20 +241,19 @@ function TelePage() {
     }
 
     useEffect(() => {
-        let timer = 0;
-        let interval = setInterval(() => {
-            timer += 50;
-            if (timer >= 50 && previousWidth.current !== `${window.innerWidth}x${window.innerHeight}`) {
-                timer = 0;
-                console.log("resized")
-                previousWidth.current = `${window.innerWidth}x${window.innerHeight}`;
+        let timer;
+        const resize = () => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
                 handleResize();
                 setCanvasSizeVersion(version => version + 1);
-            }
-        }, 50);
+            }, 150);
+        };
+        window.addEventListener("resize", resize);
 
         return () => {
-            clearInterval(interval);
+            clearTimeout(timer);
+            window.removeEventListener("resize", resize);
         };
     }, []);
 
