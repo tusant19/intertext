@@ -31,8 +31,8 @@ function TelePage() {
     const clearToolActive = useRef(false);
     const charColorToolRef = useRef(null);
     const bgToolRef = useRef(null);
-    const currentCharColor = useRef("#000000");
-    const currentBgColor = useRef("#ffffff");
+    const currentCharColor = useRef("#ffffff");
+    const currentBgColor = useRef("#0000ff");
     const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
@@ -690,9 +690,9 @@ function TelePage() {
             </div>
             <div className="colorPickerDiv">
                 <p>Character Color</p>
-                <input type="color" id="charColorPicker" name="charColorPicker" onChange={handleCharColorChange} />
+                <input type="color" id="charColorPicker" name="charColorPicker" value={currentCharColor.current} onChange={handleCharColorChange} />
                 <p>Background Color</p>
-                <input type="color" id="bgColorPicker" name="bgColorPicker" onChange={handleBgColorChange}/>
+                <input type="color" id="bgColorPicker" name="bgColorPicker" value={currentBgColor.current} onChange={handleBgColorChange}/>
             </div>
             <div className="canvasDiv" style={{ '--tv-left': `${canvasHeight.current * 540 / 2790}px`, '--tv-right': `${canvasHeight.current * 1080 / 2790}px`, '--tv-left-width': `${canvasHeight.current * 1170 / 2790}px`, '--tv-right-width': `${canvasHeight.current * 1710 / 2790}px`, '--tv-center': `${canvasHeight.current * 270 / 2790}px`, transform: `translateX(${-canvasHeight.current * 270 / 2790}px)` }}>
                 <div className="pageNumberDiv">
