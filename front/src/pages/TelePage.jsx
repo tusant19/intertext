@@ -39,7 +39,7 @@ function TelePage() {
         const socket = io(apiAdress);
 
         function connectToRoom() {
-            socket.emit('joinRoom', currentPage.current);
+            socket.emit('joinRoom', String(currentPage.current));
         }
 
         socket.on('cellCharUpdate', (x, y, char, charColor) => {
@@ -81,18 +81,20 @@ function TelePage() {
             };
         });
 
-        connectToRoom();
+        socket.on('connect', connectToRoom);
 
         //listen for page number inputchange and rejoin room
         const pageInput = document.getElementById("pageNumberInput");
-        pageInput.addEventListener("change", () => {
+        const joinSelectedPage = () => {
             //if input less than 1 or greater than 100000 or empty ignore
             if (pageInput.value < 1 || pageInput.value > 100000 || pageInput.value === "") {
                 return;
             }
             //rejoin room
-            connectToRoom();
-        });
+            socket.emit('joinRoom', String(Number(pageInput.value)));
+        };
+        pageInput.addEventListener("input", joinSelectedPage);
+        pageInput.addEventListener("change", joinSelectedPage);
 
         //also listen for number presses when input is focused
         pageInput.addEventListener("keydown", (event) => {
@@ -107,6 +109,8 @@ function TelePage() {
         });
 
         return () => {
+            pageInput.removeEventListener("input", joinSelectedPage);
+            pageInput.removeEventListener("change", joinSelectedPage);
             socket.disconnect();
         };
     }, []);
@@ -316,6 +320,7 @@ function TelePage() {
     // monitor for key press if text tool is active
     useEffect(() => {
         function handleKeyPress(event) {
+            let isChanginBgColor = false;
             //if page 1 err
             if (currentPage.current === 1) {
                 setErrMsg("Cannot edit page 1");
@@ -338,6 +343,7 @@ function TelePage() {
                             setErrMsg("Not enough coins to change character color");
                             return;
                         } else {
+                            isChanginBgColor = true;
                             coinsRef.current = coinsRef.current - 1;
                             setCoins(prevCoins => {
                                 if (prevCoins > 0) {
@@ -354,7 +360,8 @@ function TelePage() {
                         x: clickedCell.current.x,
                         y: clickedCell.current.y,
                         char: char,
-                        charColor: currentCharColor.current
+                        charColor: currentCharColor.current,
+                        ...(isChanginBgColor && { bgColor: currentBgColor.current })
                     });
                     coinsRef.current = coinsRef.current - 1;
 

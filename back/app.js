@@ -131,7 +131,9 @@ if (infoPage1inserted.length === 0) {
 io.on('connection', (socket) => {
   console.log('connect ' + socket.id);
   socket.on('joinRoom', (room) => {
-    socket.join(room);
+    if (socket.data.pageRoom) socket.leave(socket.data.pageRoom);
+    socket.data.pageRoom = String(room);
+    socket.join(socket.data.pageRoom);
     console.log('joined page ' + room);
   });
 });
@@ -159,18 +161,22 @@ app.put('/page/:pagenumber/cellchar', (req, res) => {
   console.log(`cell update ${JSON.stringify(req.body)} for page ${req.params.pagenumber}`);
   let { x, y, char, charColor } = req.body;
 
-  if (!x || !y || !char || !charColor) {
+  if (x == null || y == null || !char || !charColor) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
   // uppercase the char
   if (char && char.length > 0) {
     char = char.toUpperCase();
   }
-  markCellOverriden.run(req.params?.pagenumber, x, y);
   let prevCell = getCellByPageIdAndCoordinates.get(req.params?.pagenumber, x, y);
-  insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, prevCell?.font || 'VT323', char, 'transparent', charColor);
+  markCellOverriden.run(req.params?.pagenumber, x, y);
+  insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, prevCell?.font || 'VT323', char, req.body.bgColor ?? prevCell?.bg ?? 'transparent', charColor);
 
   io.to(req.params?.pagenumber).emit('cellCharUpdate', x, y, char, charColor);
+  // if bg color is in req.body, emit cellBgColorUpdate event
+  if (req.body.bgColor != null && req.body.bgColor !== undefined) {
+    io.to(req.params?.pagenumber).emit('cellBgColorUpdate', x, y, req.body.bgColor);
+  }
   res.sendStatus(200);
 });
 
@@ -198,13 +204,13 @@ app.put('/page/:pagenumber/cellcharcolor', (req, res) => {
   console.log(`cell char color update ${JSON.stringify(req.body)} for page ${req.params.pagenumber}`);
   const { x, y, charColor } = req.body;
 
-  if (!x || !y || !charColor) {
+  if (x == null || y == null || !charColor) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
   let prevCell = getCellByPageIdAndCoordinates.get(req.params?.pagenumber, x, y);
 
   markCellOverriden.run(req.params?.pagenumber, x, y);
-  insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, prevCell?.font || 'VT323', prevCell?.char || '', 'transparent', charColor);
+  insertCell.run(req.params?.pagenumber, Date.now(), 0, x, y, prevCell?.font || 'VT323', prevCell?.char || '', prevCell?.bg ?? 'transparent', charColor);
 
   io.to(req.params?.pagenumber).emit('cellCharColorUpdate', x, y, charColor);
   res.sendStatus(200);
@@ -218,7 +224,7 @@ app.put('/page/:pagenumber/cellbgcolor', (req, res) => {
   console.log(`cell bg color update ${JSON.stringify(req.body)} for page ${req.params.pagenumber}`);
   const { x, y, bgColor } = req.body;
 
-  if (!x || !y || !bgColor) {
+  if (x == null || y == null || !bgColor) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
   let prevCell = getCellByPageIdAndCoordinates.get(req.params?.pagenumber, x, y);
