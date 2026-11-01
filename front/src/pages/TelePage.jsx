@@ -699,10 +699,8 @@ function TelePage() {
                 </div>
             </div>
             <div className="colorPickerDiv">
-                <p>Character Color</p>
-                <input type="color" id="charColorPicker" name="charColorPicker" value={currentCharColor.current} onChange={handleCharColorChange} />
-                <p>Background Color</p>
-                <input type="color" id="bgColorPicker" name="bgColorPicker" value={currentBgColor.current} onChange={handleBgColorChange}/>
+                <label className="colorControl">Text <input type="color" id="charColorPicker" name="charColorPicker" value={currentCharColor.current} onChange={handleCharColorChange} /></label>
+                <label className="colorControl">Background <input type="color" id="bgColorPicker" name="bgColorPicker" value={currentBgColor.current} onChange={handleBgColorChange}/></label>
             </div>
             <div className="canvasDiv" style={{ '--tv-left': `${canvasHeight.current * 540 / 2790}px`, '--tv-right': `${canvasHeight.current * 1080 / 2790}px`, '--tv-left-width': `${canvasHeight.current * 1170 / 2790}px`, '--tv-right-width': `${canvasHeight.current * 1710 / 2790}px`, '--tv-center': `${canvasHeight.current * 270 / 2790}px`, '--tv-left-image': `url(${tvLeftImage})`, '--tv-middle-image': `url(${tvMiddleImage})`, '--tv-right-image': `url(${tvRightImage})`, transform: window.innerWidth < 700 ? 'none' : `translateX(${-canvasHeight.current * 270 / 2790}px)` }}>
                 <div className="pageNumberDiv">

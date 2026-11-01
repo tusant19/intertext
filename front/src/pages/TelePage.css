@@ -83,6 +83,9 @@
     width: 100%;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
+    padding: 4px 10px;
+    box-sizing: border-box;
     z-index: 1;
 }
 
@@ -91,6 +94,9 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
     height: 100%;
 }
 
@@ -111,13 +117,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%;
-    padding: 1vh;
-    padding-left: 2vw;
-    padding-right: 2vw;
-    margin-right: 0.5vw;
-    margin-left: 0.5vw;
-    border-radius: 2vh;
+    height: 42px;
+    padding: 0 20px;
+    margin: 0;
+    border-radius: 12px;
     border: none;
     background-color: #f0f0f0;
 }
@@ -138,24 +141,41 @@
 
 .colorPickerDiv {
     display: flex;
-    flex-direction: row;
     align-items: center;
     justify-content: center;
     position: fixed;
-    top: 50px;
-    right: 0;
-    width: 100%;
-    height: 50px;
-    background-color: white;
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-    border-bottom-left-radius: 2vw;
-    border-bottom-right-radius: 2vw;
-    padding: 10px;
+    top: 58px;
+    right: 50%;
+    gap: 16px;
+    transform: translateX(50%);
+    background: transparent;
     z-index: 1;
 }
 
-.colorPickerDiv p {
-    margin: 0 10px;
-    font-size: 16px;
+.colorControl {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #302321;
+    font: 18px 'VT323', monospace;
+}
+
+.colorPickerDiv input {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 2px solid #8a4e45;
+    border-radius: 5px;
+    background: none;
+}
+
+@media (max-width: 699px) {
+    .toolBarDiv { height: 46px; gap: 4px; padding: 3px 5px; }
+    .coinsDisplay p { margin: 0; gap: 2px; font-size: 14px; }
+    .coinsDisplay img { height: 24px; }
+    .toolDiv { gap: 2px; }
+    .toolButton { height: 38px; padding: 0 6px; border-radius: 8px; font-size: clamp(10px, 2.6vw, 13px); }
+    .colorPickerDiv { top: 46px; right: 6px; width: calc(100% - 12px); height: 40px; transform: none; justify-content: center; padding: 5px 8px; }
+    .colorControl { gap: 3px; color: #302321; font-size: 13px; }
+    .colorPickerDiv input { width: 28px; height: 24px; }
 }
