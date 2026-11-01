@@ -23,7 +23,7 @@ function TelePage() {
     const cellsArray = useRef(Array.from({ length: columns }, () => Array.from({ length: rows }, () => ({ char: "", bg: "" }))));
     const currentPage = useRef(1);
     const [coins, setCoins] = useState(0);
-    const [, setCanvasSizeVersion] = useState(0);
+    const [canvasSizeVersion, setCanvasSizeVersion] = useState(0);
     const movingHighlightRef = useRef(null);
     const canvasRef = useRef(null);
     const clickedCell = useRef({ x: null, y: null });
@@ -80,11 +80,14 @@ function TelePage() {
 
         socket.on('cellBgColorUpdate', (x, y, bgColor) => {
             console.log(`Received cell bg color update at (${x}, ${y}) with color ${bgColor}`);
-            gridOperation(x, y, "drawBg", bgColor);
             cellsArray.current[x][y] = {
                 ...cellsArray.current[x][y],
                 bg: bgColor
             };
+            gridOperation(x, y, "drawBg", bgColor);
+            if (cellsArray.current[x][y].char) {
+                gridOperation(x, y, "drawChar", cellsArray.current[x][y].char, cellsArray.current[x][y].charColor);
+            }
         });
 
         socket.on('connect', connectToRoom);
@@ -170,9 +173,6 @@ function TelePage() {
         if (operation === "drawBg") {
             ctx.fillStyle = value;
             ctx.fillRect(x * (cellWidth.current), y * (cellHeight.current), cellWidth.current, cellHeight.current);
-            if (cellsArray.current[x][y].char !== "") {
-                gridOperation(x, y, "drawChar", cellsArray.current[x][y].char, cellsArray.current[x][y].charColor);
-            }
         }
         if (operation === "setFont") {
             console.log("setting font to " + value);
@@ -213,12 +213,24 @@ function TelePage() {
     }
 
     useEffect(() => {
+        let cancelled = false;
         clearCanvas();
-        cellsArray.current.forEach((column, x) => column.forEach(async (cell, y) => {
-            if (cell.font) await gridOperation(x, y, "setFont", cell.font);
+        cellsArray.current.forEach((column, x) => column.forEach((cell, y) => {
             if (cell.bg && cell.bg !== "transparent") gridOperation(x, y, "drawBg", cell.bg);
-            else if (cell.char) gridOperation(x, y, "drawChar", cell.char, cell.charColor);
         }));
+        (async () => {
+            let font = "";
+            for (let x = 0; x < columns; x++) for (let y = 0; y < rows; y++) {
+                const cell = cellsArray.current[x][y];
+                if (cell.font && cell.font !== font) {
+                    await gridOperation(x, y, "setFont", cell.font);
+                    if (cancelled) return;
+                    font = cell.font;
+                }
+                if (cell.char) gridOperation(x, y, "drawChar", cell.char, cell.charColor);
+            }
+        })();
+        return () => { cancelled = true; };
         
         /* cellsArray.current[0][23].char = "A";
         cellsArray.current[0][23].bg = "blue";
@@ -231,7 +243,7 @@ function TelePage() {
         gridOperation(0, 23, "drawBg", "blue");
         gridOperation(1, 23, "drawChar", "B", "yellow");
         gridOperation(1, 23, "drawBg", "red"); */
-    }, [canvasWidth.current, canvasHeight.current]);
+    }, [canvasSizeVersion]);
     
     function handleResize() {
         if (window.innerWidth < 700) {
