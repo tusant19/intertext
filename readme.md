@@ -3,6 +3,9 @@
 
 <p>Try it here: <a href="https://intertext.santtu.uk/">https://intertext.santtu.uk/</a></p>
 
+<p>Made with react as the frontend and express + socket.io as the backend</p>
+<p>Insipired by the weekly team of "retro" in Terra the program by hackclub I made this for</p>
+
 <h2>Test it locally by running these commands in both the front and back folder</h2>
 <ul>
 <li>npm install</li>
