@@ -181,5 +181,5 @@
     .colorControl { gap: 3px; color: #302321; font-size: 13px; }
     .colorPickerDiv input { width: 28px; height: 24px; }
     .mobileKeyboardButton { display: flex; position: fixed; right: 16px; bottom: 16px; width: 52px; height: 52px; align-items: center; justify-content: center; padding: 0; border: 2px solid #56342f; border-radius: 50%; background: #8a4e45; color: #f3dfa9; font-size: 24px; z-index: 2; }
-    .mobileKeyboardInput { display: block; position: fixed; right: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+    .mobileKeyboardInput { display: block; position: fixed; right: 0; bottom: 0; width: 1px; height: 1px; font-size: 16px; opacity: 0; pointer-events: none; }
 }
