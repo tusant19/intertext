@@ -89,9 +89,7 @@ function TelePage() {
             if (pageInput.value < 1 || pageInput.value > 100000 || pageInput.value === "") {
                 return;
             }
-            //reset socket connection and rejoin room
-            socket.disconnect();
-            socket.connect();
+            //rejoin room
             connectToRoom();
         });
 
@@ -102,9 +100,7 @@ function TelePage() {
                 if (pageInput.value < 1 || pageInput.value > 100000 || pageInput.value === "") {
                     return;
                 }
-                //reset socket connection and rejoin room
-                socket.disconnect();
-                socket.connect();
+                //rejoin room
                 socket.emit('joinRoom', currentPage.current + event.key);
             }
         });
@@ -610,6 +606,15 @@ function TelePage() {
     }
 
     function changePageNumber(event) {
+        const pageInput = event.target;
+        if (pageInput.value === "") {
+            return;
+        }
+        if (pageInput.value < 1 || pageInput.value > 100000) {
+            return;
+        }
+        //deactivate all tools to prevent random issues
+        deactivateAllTools();
         const newPageNumber = parseInt(event.target.value);
         if (isNaN(newPageNumber) || newPageNumber < 1 || newPageNumber > 100000) {
             setErrMsg("Page number must be between 1 and 100k");
