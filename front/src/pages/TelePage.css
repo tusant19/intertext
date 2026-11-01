@@ -62,6 +62,16 @@
     image-rendering: pixelated;
 }
 
+@media (max-width: 699px) {
+    .canvasDiv::before {
+        left: calc((100vw - 100%) / -2);
+        width: 100vw;
+        background: url('../assets/tvmiddle.png') center / 100% 100% no-repeat;
+    }
+
+    .pageNumberDiv { left: 50%; }
+}
+
 .toolBarDiv {
     display: flex;
     flex-direction: row;
