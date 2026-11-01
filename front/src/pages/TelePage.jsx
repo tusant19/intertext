@@ -40,6 +40,7 @@ function TelePage() {
     const currentBgColor = useRef("#0000ff");
     const [errorMessage, setErrorMessage] = useState("");
     const [mobileKeyboardOpen, setMobileKeyboardOpen] = useState(false);
+    const permaHighlightRef = useRef(null);
 
     // i tried my best to comment everything that's not easily readable
     // but it's still bit messy and a lot of lines so sry for that
@@ -725,9 +726,60 @@ function TelePage() {
         setMobileKeyboardOpen(open => !open);
     }
 
+    //if hovering over a cell highlight
+    if (window.innerWidth >= 700) {
+        useEffect(() => {
+            const canvas = document.querySelector(".teleCanvas");
+            function handleMouseMove(event) {
+                const rect = canvas.getBoundingClientRect();
+                const x = Math.max(0, Math.min(columns - 1, Math.floor((event.clientX - rect.left) / cellWidth.current)));
+                const y = Math.max(0, Math.min(rows - 1, Math.floor((event.clientY - rect.top) / cellHeight.current)));
+                highlightCell(x, y);
+            }
+            canvas.addEventListener("mousemove", handleMouseMove);
+
+            return () => {
+                canvas.removeEventListener("mousemove", handleMouseMove);
+            };
+        }, [columns, rows]);
+    }
+
+    function permanentHighlightCell(x, y) {
+        //move the highlight div to the cell coordinates
+        const rect = canvasRef.current.getBoundingClientRect();
+        permaHighlightRef.current.style.left = `${rect.left + window.scrollX + x * cellWidth.current}px`;
+        permaHighlightRef.current.style.top = `${rect.top + window.scrollY + y * cellHeight.current}px`;
+        permaHighlightRef.current.style.width = `${cellWidth.current}px`;
+        permaHighlightRef.current.style.height = `${cellHeight.current}px`;
+        permaHighlightRef.current.style.display = "block";
+    }
+
+    function clearPermanentHighlight() {
+        permaHighlightRef.current.style.display = "none";
+    }
+
+    //permanently highlight cell when clicked until another cell is clicked
+    useEffect(() => {
+        const canvas = document.querySelector(".teleCanvas");
+        function handleClick(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.max(0, Math.min(columns - 1, Math.floor((event.clientX - rect.left) / cellWidth.current)));
+            const y = Math.max(0, Math.min(rows - 1, Math.floor((event.clientY - rect.top) / cellHeight.current)));
+            clickedCell.current = { x, y };
+            console.log(`Clicked cell: ${clickedCell.current.x}, ${clickedCell.current.y}`);
+            permanentHighlightCell(x, y);
+        }
+        canvas.addEventListener("pointerdown", handleClick);
+
+        return () => {
+            canvas.removeEventListener("pointerdown", handleClick);
+        };
+    }, [columns, rows]);
+
     return (
         <div className="telePageMain">
             <div className="movingHighlightDiv" ref={movingHighlightRef}></div>
+            <div className="permaHighlightDiv" ref={permaHighlightRef}></div>
             <div className="toolBarDiv">
                 <div className="coinsDisplay">
                     <p><img src={coinImage} alt="Coin" /> {coins}</p>

@@ -132,7 +132,21 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 255, 0);
-    border: 4px solid rgba(0, 0, 255, 0.3);
+    border: 4px solid rgba(0, 0, 255, 0.4);
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 9999;
+    display: none;
+}
+
+.permaHighlightDiv {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 255, 0);
+    border: 4px solid rgba(255, 255, 255, 0.4);
     box-sizing: border-box;
     pointer-events: none;
     z-index: 9999;

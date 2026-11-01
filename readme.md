@@ -19,7 +19,7 @@
 <h2>Trying it:</h2>
 <p>You'll get 1 coin every second when the page is open seen in the top left of the page. Each tool use consumes 1 coin with the exception of the text tool (if it's also changing the background color it will require 2 coins)</p>
 <p>You can use the page number field (seen in the top beam above the screen) to switch pages</p>
-<p>Select a tool by pressing it and then press anywhere on the canvas and you'll see the slot highlighted for a second</p>
+<p>Select a tool by pressing it and then press anywhere on the canvas and you'll see the slot highlighted</p>
 <p>Then if you're using the text tool write characters you want with the colors you want selected at the top</p>
 <p>If you're using some of the other tools instead the key you'll need to press is either enter or backspace, the default page 1 will always remind you which is which</p>
 
