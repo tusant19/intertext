@@ -172,6 +172,7 @@
 .mobileKeyboardButton, .mobileKeyboardPanel { display: none; }
 
 @media (max-width: 699px) {
+    .errorDiv { top: auto; bottom: calc(110.753% + 8px); color: #8a4e45; font: 20px 'VT323', monospace; }
     .toolBarDiv { height: 46px; gap: 4px; padding: 3px 5px; }
     .coinsDisplay p { margin: 0; gap: 2px; font-size: 14px; }
     .coinsDisplay img { height: 24px; }

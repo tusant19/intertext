@@ -337,7 +337,6 @@ function TelePage() {
             }
             if (textToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
                 if (coinsRef.current < 1) {
-                    console.log("Not enough coins to type");
                     setErrMsg("Not enough coins to type");
                     return;
                 } else {
@@ -347,7 +346,6 @@ function TelePage() {
                     //if charcolor not the same take additional coin
                     if (currentCharColor.current !== cellsArray.current[clickedCell.current.x][clickedCell.current.y].charColor) {
                         if (coinsRef.current < 2) {
-                            console.log("Not enough coins to change character color");
                             setErrMsg("Not enough coins to change character color");
                             return;
                         } else {
@@ -411,7 +409,6 @@ function TelePage() {
             if (clearToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
                 if (coinsRef.current < 1) {
                     setErrMsg("Not enough coins to clear");
-                    console.log("Not enough coins to clear");
                     return;
                 } else {
                     axios.put(`${apiAdress}/page/${currentPage.current}/cellclear`, {
@@ -459,7 +456,6 @@ function TelePage() {
             if (charColorToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
                 if (coinsRef.current < 1) {
                     setErrMsg("Not enough coins to change character color");
-                    console.log("Not enough coins to change character color");
                     return;
                 } else {
                     const charColor = document.getElementById("charColorPicker").value;
@@ -496,7 +492,6 @@ function TelePage() {
             }
             if (bgToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
                 if (coinsRef.current < 1) {
-                    console.log("Not enough coins to change background color");
                     setErrMsg("Not enough coins to change background color");
                     return;
                 } else {
