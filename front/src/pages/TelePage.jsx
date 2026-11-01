@@ -130,6 +130,7 @@ function TelePage() {
         axios.get(`${apiAdress}/page/${currentPage.current}`)
             .then(response => {
                 const cells = response.data.cells;
+                storeCells(cells);
                 cells.forEach(async (cell) => {
                     if (cell.font != "" && cell.font != null) {
                         await gridOperation(cell.x, cell.y, "setFont", cell.font);
@@ -140,11 +141,12 @@ function TelePage() {
                     if (cell.char != "" && cell.char != null) {
                         await gridOperation(cell.x, cell.y, "drawChar", cell.char, cell.charColor);
                     }
+                    const storedCell = cellsArray.current[cell.x][cell.y];
                     cellsArray.current[cell.x][cell.y] = {
-                        font: cell.font,
-                        char: cell.char,
-                        bg: cell.bg,
-                        charColor: cell.charColor
+                        font: cell.font || storedCell.font,
+                        char: cell.char || storedCell.char,
+                        bg: cell.bg && cell.bg !== "transparent" ? cell.bg : storedCell.bg,
+                        charColor: cell.char ? cell.charColor : storedCell.charColor
                     };
                 });
             });
@@ -210,6 +212,18 @@ function TelePage() {
     function clearCanvas() {
         let ctx = document.querySelector(".teleCanvas").getContext("2d");
         ctx.clearRect(0, 0, canvasWidth.current, canvasHeight.current);
+    }
+
+    function storeCells(cells) {
+        cells.forEach((cell) => {
+            const storedCell = cellsArray.current[cell.x][cell.y];
+            cellsArray.current[cell.x][cell.y] = {
+                font: cell.font || storedCell.font,
+                char: cell.char || storedCell.char,
+                bg: cell.bg && cell.bg !== "transparent" ? cell.bg : storedCell.bg,
+                charColor: cell.char ? cell.charColor : storedCell.charColor
+            };
+        });
     }
 
     useEffect(() => {
@@ -652,6 +666,7 @@ function TelePage() {
         axios.get(`${apiAdress}/page/${currentPage.current}`)
             .then(response => {
                 const cells = response.data.cells;
+                storeCells(cells);
                 cells.forEach(async (cell) => {
                     if (cell.font != "" && cell.font != null) {
                         await gridOperation(cell.x, cell.y, "setFont", cell.font);
@@ -662,11 +677,12 @@ function TelePage() {
                     if (cell.char != "" && cell.char != null) {
                         await gridOperation(cell.x, cell.y, "drawChar", cell.char, cell.charColor);
                     }
+                    const storedCell = cellsArray.current[cell.x][cell.y];
                     cellsArray.current[cell.x][cell.y] = {
-                        font: cell.font,
-                        char: cell.char,
-                        bg: cell.bg,
-                        charColor: cell.charColor
+                        font: cell.font || storedCell.font,
+                        char: cell.char || storedCell.char,
+                        bg: cell.bg && cell.bg !== "transparent" ? cell.bg : storedCell.bg,
+                        charColor: cell.char ? cell.charColor : storedCell.charColor
                     };
                 });
             });
