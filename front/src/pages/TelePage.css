@@ -13,7 +13,7 @@
     isolation: isolate;
 }
 
-.teleCanvas { display: block; }
+.teleCanvas { display: block; touch-action: none; }
 
 .pageNumberDiv {
     position: absolute;
@@ -180,11 +180,11 @@
     .colorPickerDiv { top: 46px; right: 6px; width: calc(100% - 12px); height: 40px; transform: none; justify-content: center; padding: 5px 8px; }
     .colorControl { gap: 3px; color: #302321; font-size: 13px; }
     .colorPickerDiv input { width: 28px; height: 24px; }
-    .mobileKeyboardButton { display: flex; position: fixed; right: 16px; bottom: 16px; width: 52px; height: 52px; align-items: center; justify-content: center; padding: 0; border: 2px solid #56342f; border-radius: 50%; background: #8a4e45; color: #f3dfa9; font-size: 24px; z-index: 4; }
+    .mobileKeyboardButton { display: flex; position: fixed; right: 16px; bottom: 16px; width: 52px; height: 52px; align-items: center; justify-content: center; padding: 0; border: 2px solid #56342f; border-radius: 50%; background: #8a4e45; color: #f3dfa9; font-size: 24px; z-index: 4; touch-action: manipulation; }
     .mobileKeyboardPanel { position: fixed; right: 8px; bottom: 76px; left: 8px; display: flex; flex-direction: column; gap: 5px; padding: 8px; border: 2px solid #56342f; border-radius: 12px; background: #f3dfa9; z-index: 3; touch-action: manipulation; }
-    .mobileKeyboardRow { display: flex; width: 100%; gap: 4px; }
+    .mobileKeyboardRow { display: flex; width: 100%; gap: 3px; }
     .mobileKeyboardLetterRow:nth-child(2) { width: 92%; margin: 0 auto; }
     .mobileKeyboardLetterRow:nth-child(3) { width: 84%; margin: 0 auto; }
-    .mobileKeyboardKey { flex: 1; min-width: 0; height: 36px; padding: 0; border: 1px solid #56342f; border-radius: 7px; background: #f0f0f0; color: #302321; font: 20px 'VT323', monospace; }
+    .mobileKeyboardKey { flex: 1; min-width: 0; height: 44px; padding: 0; border: 1px solid #56342f; border-radius: 7px; background: #f0f0f0; color: #302321; font: 20px 'VT323', monospace; touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; }
     .mobileKeyboardSpace { flex: 3; }
 }

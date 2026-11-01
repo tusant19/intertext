@@ -287,17 +287,17 @@ function TelePage() {
         const canvas = document.querySelector(".teleCanvas");
         function handleClick(event) {
             const rect = canvas.getBoundingClientRect();
-            const x = Math.floor((event.clientX - rect.left) / cellWidth.current);
-            const y = Math.floor((event.clientY - rect.top) / cellHeight.current);
+            const x = Math.max(0, Math.min(columns - 1, Math.floor((event.clientX - rect.left) / cellWidth.current)));
+            const y = Math.max(0, Math.min(rows - 1, Math.floor((event.clientY - rect.top) / cellHeight.current)));
             
             clickedCell.current = { x, y };
             console.log(`Clicked cell: ${clickedCell.current.x}, ${clickedCell.current.y}`);
             highlightCell(x, y);
         }
-        canvas.addEventListener("click", handleClick);
+        canvas.addEventListener("pointerdown", handleClick);
 
         return () => {
-            canvas.removeEventListener("click", handleClick);
+            canvas.removeEventListener("pointerdown", handleClick);
         };
     }, []);
 
@@ -682,8 +682,20 @@ function TelePage() {
         }, 5000);
     }
 
-    function pressMobileKey(key) {
+    function pressMobileKey(event, key) {
+        if (event.isPrimary === false) {
+            return;
+        }
+        event.preventDefault();
         window.dispatchEvent(new KeyboardEvent("keydown", { key }));
+    }
+
+    function toggleMobileKeyboard(event) {
+        if (event.isPrimary === false) {
+            return;
+        }
+        event.preventDefault();
+        setMobileKeyboardOpen(open => !open);
     }
 
     return (
@@ -712,15 +724,15 @@ function TelePage() {
                 <label className="colorControl">Text <input type="color" id="charColorPicker" name="charColorPicker" value={currentCharColor.current} onChange={handleCharColorChange} /></label>
                 <label className="colorControl">Background <input type="color" id="bgColorPicker" name="bgColorPicker" value={currentBgColor.current} onChange={handleBgColorChange}/></label>
             </div>
-            <button className="mobileKeyboardButton" type="button" aria-label={mobileKeyboardOpen ? "Close keyboard" : "Open keyboard"} aria-expanded={mobileKeyboardOpen} aria-controls="mobileKeyboard" onClick={() => setMobileKeyboardOpen(open => !open)}>{mobileKeyboardOpen ? "×" : "⌨"}</button>
+            <button className="mobileKeyboardButton" type="button" aria-label={mobileKeyboardOpen ? "Close keyboard" : "Open keyboard"} aria-expanded={mobileKeyboardOpen} aria-controls="mobileKeyboard" onPointerDown={toggleMobileKeyboard}>{mobileKeyboardOpen ? "×" : "⌨"}</button>
             {mobileKeyboardOpen && <div className="mobileKeyboardPanel" id="mobileKeyboard">
                 {mobileKeyboardRows.map(row => <div className="mobileKeyboardRow mobileKeyboardLetterRow" key={row}>
-                    {[...row].map(key => <button className="mobileKeyboardKey" type="button" key={key} onClick={() => pressMobileKey(key)}>{key}</button>)}
+                    {[...row].map(key => <button className="mobileKeyboardKey" type="button" key={key} onPointerDown={(event) => pressMobileKey(event, key)}>{key}</button>)}
                 </div>)}
                 <div className="mobileKeyboardRow mobileKeyboardActions">
-                    <button className="mobileKeyboardKey mobileKeyboardSpace" type="button" onClick={() => pressMobileKey(" ")}>Space</button>
-                    <button className="mobileKeyboardKey" type="button" aria-label="Backspace" onClick={() => pressMobileKey("Backspace")}>⌫</button>
-                    <button className="mobileKeyboardKey" type="button" aria-label="Enter" onClick={() => pressMobileKey("Enter")}>↵</button>
+                    <button className="mobileKeyboardKey mobileKeyboardSpace" type="button" onPointerDown={(event) => pressMobileKey(event, " ")}>Space</button>
+                    <button className="mobileKeyboardKey" type="button" aria-label="Backspace" onPointerDown={(event) => pressMobileKey(event, "Backspace")}>⌫</button>
+                    <button className="mobileKeyboardKey" type="button" aria-label="Enter" onPointerDown={(event) => pressMobileKey(event, "Enter")}>↵</button>
                 </div>
             </div>}
             <div className="canvasDiv" style={{ '--tv-left': `${canvasHeight.current * 540 / 2790}px`, '--tv-right': `${canvasHeight.current * 1080 / 2790}px`, '--tv-left-width': `${canvasHeight.current * 1170 / 2790}px`, '--tv-right-width': `${canvasHeight.current * 1710 / 2790}px`, '--tv-center': `${canvasHeight.current * 270 / 2790}px`, '--tv-left-image': `url(${tvLeftImage})`, '--tv-middle-image': `url(${tvMiddleImage})`, '--tv-right-image': `url(${tvRightImage})`, transform: window.innerWidth < 700 ? 'none' : `translateX(${-canvasHeight.current * 270 / 2790}px)` }}>
