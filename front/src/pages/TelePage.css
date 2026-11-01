@@ -57,8 +57,8 @@
     width: calc(100% + var(--tv-left) + var(--tv-right));
     height: 121.505%;
     background: var(--tv-left-image) left center / var(--tv-left-width) 100% no-repeat,
-                var(--tv-middle-image) var(--tv-left-width) center / calc(100% - var(--tv-left-width) - var(--tv-right-width)) 100% no-repeat,
-                var(--tv-right-image) right center / var(--tv-right-width) 100% no-repeat;
+                var(--tv-right-image) right center / var(--tv-right-width) 100% no-repeat,
+                var(--tv-middle-image) calc(var(--tv-left-width) - 1px) center / calc(100% - var(--tv-left-width) - var(--tv-right-width) + 2px) 100% no-repeat;
     image-rendering: pixelated;
 }
 
@@ -169,7 +169,7 @@
     background: none;
 }
 
-.mobileKeyboardButton, .mobileKeyboardInput { display: none; }
+.mobileKeyboardButton, .mobileKeyboardPanel { display: none; }
 
 @media (max-width: 699px) {
     .toolBarDiv { height: 46px; gap: 4px; padding: 3px 5px; }
@@ -180,6 +180,11 @@
     .colorPickerDiv { top: 46px; right: 6px; width: calc(100% - 12px); height: 40px; transform: none; justify-content: center; padding: 5px 8px; }
     .colorControl { gap: 3px; color: #302321; font-size: 13px; }
     .colorPickerDiv input { width: 28px; height: 24px; }
-    .mobileKeyboardButton { display: flex; position: fixed; right: 16px; bottom: 16px; width: 52px; height: 52px; align-items: center; justify-content: center; padding: 0; border: 2px solid #56342f; border-radius: 50%; background: #8a4e45; color: #f3dfa9; font-size: 24px; z-index: 2; }
-    .mobileKeyboardInput { display: block; position: fixed; right: 0; bottom: 0; width: 1px; height: 1px; font-size: 16px; opacity: 0; pointer-events: none; }
+    .mobileKeyboardButton { display: flex; position: fixed; right: 16px; bottom: 16px; width: 52px; height: 52px; align-items: center; justify-content: center; padding: 0; border: 2px solid #56342f; border-radius: 50%; background: #8a4e45; color: #f3dfa9; font-size: 24px; z-index: 4; }
+    .mobileKeyboardPanel { position: fixed; right: 8px; bottom: 76px; left: 8px; display: flex; flex-direction: column; gap: 5px; padding: 8px; border: 2px solid #56342f; border-radius: 12px; background: #f3dfa9; z-index: 3; touch-action: manipulation; }
+    .mobileKeyboardRow { display: flex; width: 100%; gap: 4px; }
+    .mobileKeyboardLetterRow:nth-child(2) { width: 92%; margin: 0 auto; }
+    .mobileKeyboardLetterRow:nth-child(3) { width: 84%; margin: 0 auto; }
+    .mobileKeyboardKey { flex: 1; min-width: 0; height: 36px; padding: 0; border: 1px solid #56342f; border-radius: 7px; background: #f0f0f0; color: #302321; font: 20px 'VT323', monospace; }
+    .mobileKeyboardSpace { flex: 3; }
 }
