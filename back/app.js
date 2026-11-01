@@ -60,20 +60,39 @@ if (!exampleExists) {
 const infoPage1inserted = getCellsByPageId.all(1); 
 if (infoPage1inserted.length === 0) {
   //insert text for page 1 
-  // "welcome to intertext"
-  // "use page browser to switch pages"
-  // "use tools to edit text"
-  const welcomeText = "welcome to intertext";
+  // "WELCOME TO INTERTEXT"
+  // "USE PAGE BROWSER TO SWITCH PAGES"
+  // "USE TOOLS TO EDIT TEXT"
+  // guide text
+  // "USE BACKSPACE OR DELETE WITH CLEAR TOOL"
+  // "USE ENTER TO SET CHAR AND BACKGROUND COLOR"
+  const welcomeText = "WELCOME TO INTERTEXT";
   for (let i = 0; i < welcomeText.length; i++) {
     insertCell.run(1, Date.now(), 0, (i + 3), 2, 'VT323', welcomeText[i], 'transparent', 'white');
   }
-  const pageBrowserText = "use page browser to switch pages";
+  const pageBrowserText = "USE PAGE BROWSER TO SWITCH PAGES";
   for (let i = 0; i < pageBrowserText.length; i++) {
     insertCell.run(1, Date.now(), 0, (i + 3), 6, 'VT323', pageBrowserText[i], 'transparent', 'white');
   }
-  const toolsText = "use tools to edit text";
+  const toolsText = "USE TOOLS TO EDIT TEXT";
   for (let i = 0; i < toolsText.length; i++) {
     insertCell.run(1, Date.now(), 0, (i + 3), 10, 'VT323', toolsText[i], 'transparent', 'white');
+  }
+  const clearToolGuideTextLine1 = "USE BACKSPACE OR DELETE WITH CLEAR";
+  const clearToolGuideTextLine2 = "TOOL";
+  for (let i = 0; i < clearToolGuideTextLine1.length; i++) {
+    insertCell.run(1, Date.now(), 0, (i + 3), 13,  'VT323', clearToolGuideTextLine1[i], 'transparent', 'white');
+  }
+  for (let i = 0; i < clearToolGuideTextLine2.length; i++) {
+    insertCell.run(1, Date.now(), 0, (i + 3), 14,  'VT323', clearToolGuideTextLine2[i], 'transparent', 'white');
+  }
+  const charBgColorGuideTextLine1 = "USE ENTER TO SET CHAR AND";
+  const charBgColorGuideTextLine2 = "BACKGROUND COLOR";
+  for (let i = 0; i < charBgColorGuideTextLine1.length; i++) {
+    insertCell.run(1, Date.now(), 0, (i + 3), 17, 'VT323', charBgColorGuideTextLine1[i], 'transparent', 'white');
+  }
+  for (let i = 0; i < charBgColorGuideTextLine2.length; i++) {
+    insertCell.run(1, Date.now(), 0, (i + 3), 18, 'VT323', charBgColorGuideTextLine2[i], 'transparent', 'white');
   }
 
   //insert backgrounds for page 1
@@ -92,6 +111,18 @@ if (infoPage1inserted.length === 0) {
   //background for "use tools to edit text" including around it 
   for (let x = 2; x < toolsText.length + 5; x++) {
     for (let y = 9; y < 12; y++) {
+      insertCell.run(1, Date.now(), 0, x, y, 'VT323', '', 'blue', '');
+    }
+  }
+  //background for "use backspace or delete with clear tool" but just one out to the sides and below
+  for (let x = 2; x < clearToolGuideTextLine1.length + 5; x++) {
+    for (let y = 13; y < 16; y++) {
+      insertCell.run(1, Date.now(), 0, x, y, 'VT323', '', 'blue', '');
+    }
+  }
+  //background for "and use enter enter to set char and bg color" but just one out to the sides and below
+  for (let x = 2; x < charBgColorGuideTextLine1.length + 5; x++) {
+    for (let y = 17; y < 20; y++) {
       insertCell.run(1, Date.now(), 0, x, y, 'VT323', '', 'blue', '');
     }
   }
@@ -126,10 +157,14 @@ app.put('/page/:pagenumber/cellchar', (req, res) => {
   }
 
   console.log(`cell update ${JSON.stringify(req.body)} for page ${req.params.pagenumber}`);
-  const { x, y, char, charColor } = req.body;
+  let { x, y, char, charColor } = req.body;
 
   if (!x || !y || !char || !charColor) {
     return res.status(400).json({ error: 'Missing required fields' });
+  }
+  // uppercase the char
+  if (char && char.length > 0) {
+    char = char.toUpperCase();
   }
   markCellOverriden.run(req.params?.pagenumber, x, y);
   let prevCell = getCellByPageIdAndCoordinates.get(req.params?.pagenumber, x, y);

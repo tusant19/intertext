@@ -38,7 +38,7 @@ function TelePage() {
         const socket = io(apiAdress);
 
         function connectToRoom() {
-            socket.emit('joinRoom', "100");
+            socket.emit('joinRoom', currentPage.current);
         }
 
         socket.on('cellCharUpdate', (x, y, char, charColor) => {
@@ -81,6 +81,33 @@ function TelePage() {
         });
 
         connectToRoom();
+
+        //listen for page number inputchange and rejoin room
+        const pageInput = document.getElementById("pageNumberInput");
+        pageInput.addEventListener("change", () => {
+            //if input less than 1 or greater than 100000 or empty ignore
+            if (pageInput.value < 1 || pageInput.value > 100000 || pageInput.value === "") {
+                return;
+            }
+            //reset socket connection and rejoin room
+            socket.disconnect();
+            socket.connect();
+            connectToRoom();
+        });
+
+        //also listen for number presses when input is focused
+        pageInput.addEventListener("keydown", (event) => {
+            if (event.key === "1" || event.key === "2" || event.key === "3" || event.key === "4" || event.key === "5" || event.key === "6" || event.key === "7" || event.key === "8" || event.key === "9" || event.key === "0") {
+                //if input less than 1 or greater than 100000 or empty ignore
+                if (pageInput.value < 1 || pageInput.value > 100000 || pageInput.value === "") {
+                    return;
+                }
+                //reset socket connection and rejoin room
+                socket.disconnect();
+                socket.connect();
+                socket.emit('joinRoom', currentPage.current + event.key);
+            }
+        });
 
         return () => {
             socket.disconnect();
@@ -363,6 +390,10 @@ function TelePage() {
                 console.log("Cannot edit page 1");
                 return;
             }
+            //if key not backspace or delete
+            if (event.key !== "Backspace" && event.key !== "Delete") {
+                return;
+            }
             if (clearToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
                 if (coinsRef.current < 1) {
                     setErrMsg("Not enough coins to clear");
@@ -407,6 +438,10 @@ function TelePage() {
                 console.log("Cannot edit page 1");
                 return;
             }
+            //if key not enter
+            if (event.key !== "Enter") {
+                return;
+            }
             if (charColorToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
                 if (coinsRef.current < 1) {
                     setErrMsg("Not enough coins to change character color");
@@ -439,6 +474,10 @@ function TelePage() {
             if (currentPage.current === 1) {
                 setErrMsg("Cannot edit page 1");
                 console.log("Cannot edit page 1");
+                return;
+            }
+            //if key not enter
+            if (event.key !== "Enter") {
                 return;
             }
             if (bgToolActive.current && clickedCell.current.x !== null && clickedCell.current.y !== null) {
