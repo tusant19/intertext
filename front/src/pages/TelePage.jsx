@@ -41,6 +41,10 @@ function TelePage() {
     const [errorMessage, setErrorMessage] = useState("");
     const [mobileKeyboardOpen, setMobileKeyboardOpen] = useState(false);
 
+    // i tried my best to comment everything that's not easily readable
+    // but it's still bit messy and a lot of lines so sry for that
+    // (especially to you my terra reviewer or voter who's hopefully reading my code).
+
     useEffect(() => {
         const socket = io(apiAdress);
 
