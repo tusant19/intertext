@@ -727,22 +727,24 @@ function TelePage() {
     }
 
     //if hovering over a cell highlight
-    if (window.innerWidth >= 700) {
-        useEffect(() => {
-            const canvas = document.querySelector(".teleCanvas");
-            function handleMouseMove(event) {
-                const rect = canvas.getBoundingClientRect();
-                const x = Math.max(0, Math.min(columns - 1, Math.floor((event.clientX - rect.left) / cellWidth.current)));
-                const y = Math.max(0, Math.min(rows - 1, Math.floor((event.clientY - rect.top) / cellHeight.current)));
-                highlightCell(x, y);
-            }
-            canvas.addEventListener("mousemove", handleMouseMove);
+    useEffect(() => {
+        if (window.innerWidth < 700) {
+            return undefined;
+        }
 
-            return () => {
-                canvas.removeEventListener("mousemove", handleMouseMove);
-            };
-        }, [columns, rows]);
-    }
+        const canvas = document.querySelector(".teleCanvas");
+        function handleMouseMove(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.max(0, Math.min(columns - 1, Math.floor((event.clientX - rect.left) / cellWidth.current)));
+            const y = Math.max(0, Math.min(rows - 1, Math.floor((event.clientY - rect.top) / cellHeight.current)));
+            highlightCell(x, y);
+        }
+        canvas.addEventListener("mousemove", handleMouseMove);
+
+        return () => {
+            canvas.removeEventListener("mousemove", handleMouseMove);
+        };
+    }, [columns, rows]);
 
     function permanentHighlightCell(x, y) {
         //move the highlight div to the cell coordinates

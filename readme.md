@@ -23,4 +23,4 @@
 <p>Then if you're using the text tool write characters you want with the colors you want selected at the top</p>
 <p>If you're using some of the other tools instead the key you'll need to press is either enter or backspace, the default page 1 will always remind you which is which</p>
 
-<p>ps. I had a pretty high fever while making this so it may be reflected in some strange choices /hj</p>
+<p>p.s. I had a pretty high fever while making this so it may be reflected in some strange choices /hj</p>
