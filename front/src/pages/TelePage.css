@@ -5,6 +5,46 @@
     justify-content: center;
     width: 100dvw;
     height: 100dvh;
+    overflow-x: clip;
+}
+
+.canvasDiv {
+    position: relative;
+    isolation: isolate;
+}
+
+.teleCanvas { display: block; }
+
+.pageNumberDiv {
+    position: absolute;
+    top: -9.677%;
+    height: 9.677%;
+    left: calc(50% + var(--tv-center));
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    z-index: 1;
+}
+
+.errorDiv {
+    position: absolute;
+    top: calc(110.753% + 8px);
+    width: 100%;
+    text-align: center;
+}
+
+.canvasDiv::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: calc(0px - var(--tv-left));
+    top: -10.753%;
+    width: calc(100% + var(--tv-left) + var(--tv-right));
+    height: 121.505%;
+    background: url('../assets/tvleft.png') left center / var(--tv-left-width) 100% no-repeat,
+                url('../assets/tvmiddle.png') var(--tv-left-width) center / calc(100% - var(--tv-left-width) - var(--tv-right-width)) 100% no-repeat,
+                url('../assets/tvright.png') right center / var(--tv-right-width) 100% no-repeat;
+    image-rendering: pixelated;
 }
 
 .toolBarDiv {
@@ -18,6 +58,7 @@
     width: 100%;
     align-items: center;
     justify-content: space-between;
+    z-index: 1;
 }
 
 .toolDiv {
@@ -73,6 +114,7 @@
     border-bottom-left-radius: 2vw;
     border-bottom-right-radius: 2vw;
     padding: 10px;
+    z-index: 1;
 }
 
 .colorPickerDiv p {

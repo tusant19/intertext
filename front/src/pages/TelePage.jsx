@@ -8,16 +8,17 @@ import '@fontsource/vt323';
 import { useState } from "react";
 
 function TelePage() {
-    const previousWidth = useRef(window.innerWidth);
+    const previousWidth = useRef(`${window.innerWidth}x${window.innerHeight}`);
     const rows = 24;
     const columns = 40;
-    const canvasHeight = useRef(rows * (window.innerHeight / 100) * 2);
     const canvasWidth = useRef(columns * (window.innerWidth / 100));
+    const canvasHeight = useRef(Math.min(rows * (window.innerHeight / 100) * 2, canvasWidth.current * 2790 / 1500, (window.innerWidth * 0.95 - canvasWidth.current) * 2790 / 1620));
     const cellWidth = useRef(canvasWidth.current / columns);
     const cellHeight = useRef(canvasHeight.current / rows);
     const cellsArray = useRef(Array.from({ length: columns }, () => Array.from({ length: rows }, () => ({ char: "", bg: "" }))));
     const currentPage = useRef(1);
     const [coins, setCoins] = useState(0);
+    const [, setCanvasSizeVersion] = useState(0);
     const movingHighlightRef = useRef(null);
     const canvasRef = useRef(null);
     const clickedCell = useRef({ x: null, y: null });
@@ -137,7 +138,7 @@ function TelePage() {
     }, [currentPage.current]);
 
     if (window.innerWidth < 700) {
-        canvasWidth.current = window.innerWidth * 0.95;
+        canvasWidth.current = Math.min(window.innerWidth * 0.95 / (1 + 0.78 * 1620 / 2790), window.innerHeight * 0.7 / (0.78 * 3390 / 2790));
         canvasHeight.current = canvasWidth.current / columns * rows * 1.3;
         cellWidth.current = canvasWidth.current / columns;
         cellHeight.current = canvasHeight.current / rows;
@@ -171,7 +172,7 @@ function TelePage() {
         if (operation === "removeChar") {
             cellsArray.current[x][y].char = "";
             ctx.clearRect(x * (cellWidth.current), y * (cellHeight.current), cellWidth.current, cellHeight.current);
-            if (cellsArray.current[x][y].bg !== "") {
+            if (cellsArray.current[x][y].bg) {
                 gridOperation(x, y, "drawBg", cellsArray.current[x][y].bg);
             }
         }
@@ -196,19 +197,18 @@ function TelePage() {
         }
     }
 
-    useEffect(() => {
-        drawCanvasGrid();
-    }, []);
-
     function clearCanvas() {
         let ctx = document.querySelector(".teleCanvas").getContext("2d");
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvasWidth.current, canvasHeight.current);
+        ctx.clearRect(0, 0, canvasWidth.current, canvasHeight.current);
     }
 
     useEffect(() => {
         clearCanvas();
-        drawCanvasGrid();
+        cellsArray.current.forEach((column, x) => column.forEach(async (cell, y) => {
+            if (cell.font) await gridOperation(x, y, "setFont", cell.font);
+            if (cell.bg && cell.bg !== "transparent") gridOperation(x, y, "drawBg", cell.bg);
+            else if (cell.char) gridOperation(x, y, "drawChar", cell.char, cell.charColor);
+        }));
         
         /* cellsArray.current[0][23].char = "A";
         cellsArray.current[0][23].bg = "blue";
@@ -225,13 +225,13 @@ function TelePage() {
     
     function handleResize() {
         if (window.innerWidth < 700) {
-            canvasWidth.current = window.innerWidth * 0.95;
+            canvasWidth.current = Math.min(window.innerWidth * 0.95 / (1 + 0.78 * 1620 / 2790), window.innerHeight * 0.7 / (0.78 * 3390 / 2790));
             canvasHeight.current = canvasWidth.current / columns * rows * 1.3;
             cellWidth.current = canvasWidth.current / columns;
             cellHeight.current = canvasHeight.current / rows;
         } else {
-            canvasHeight.current = rows * (window.innerHeight / 100) * 2;
             canvasWidth.current = columns * (window.innerWidth / 100);
+            canvasHeight.current = Math.min(rows * (window.innerHeight / 100) * 2, canvasWidth.current * 2790 / 1500, (window.innerWidth * 0.95 - canvasWidth.current) * 2790 / 1620);
             cellWidth.current = canvasWidth.current / columns;
             cellHeight.current = canvasHeight.current / rows;
         }
@@ -241,11 +241,12 @@ function TelePage() {
         let timer = 0;
         let interval = setInterval(() => {
             timer += 50;
-            if (timer >= 50 && previousWidth.current !== window.innerWidth) {
+            if (timer >= 50 && previousWidth.current !== `${window.innerWidth}x${window.innerHeight}`) {
                 timer = 0;
                 console.log("resized")
-                previousWidth.current = window.innerWidth;
+                previousWidth.current = `${window.innerWidth}x${window.innerHeight}`;
                 handleResize();
+                setCanvasSizeVersion(version => version + 1);
             }
         }, 50);
 
@@ -294,8 +295,9 @@ function TelePage() {
     // add a bloom effect around cell
     function highlightCell(x, y) {
         //move the highlight div to the cell coordinates
-        movingHighlightRef.current.style.left = `${canvasRef.current.offsetLeft + x * cellWidth.current}px`;
-        movingHighlightRef.current.style.top = `${canvasRef.current.offsetTop + y * cellHeight.current}px`;
+        const rect = canvasRef.current.getBoundingClientRect();
+        movingHighlightRef.current.style.left = `${rect.left + window.scrollX + x * cellWidth.current}px`;
+        movingHighlightRef.current.style.top = `${rect.top + window.scrollY + y * cellHeight.current}px`;
         movingHighlightRef.current.style.width = `${cellWidth.current}px`;
         movingHighlightRef.current.style.height = `${cellHeight.current}px`;
         movingHighlightRef.current.style.display = "block";
@@ -623,7 +625,7 @@ function TelePage() {
         currentPage.current = newPageNumber;
         console.log(`Changing to page number: ${currentPage.current}`);
         clearCanvas();
-        drawCanvasGrid();
+        cellsArray.current = Array.from({ length: columns }, () => Array.from({ length: rows }, () => ({ char: "", bg: "" })));
         axios.get(`${apiAdress}/page/${currentPage.current}`)
             .then(response => {
                 const cells = response.data.cells;
@@ -692,14 +694,12 @@ function TelePage() {
                 <p>Background Color</p>
                 <input type="color" id="bgColorPicker" name="bgColorPicker" onChange={handleBgColorChange}/>
             </div>
-            <div className="pageNumberDiv">
-                <input type="number" id="pageNumberInput" name="pageNumberInput" min="1" max="100000" defaultValue={currentPage.current} onChange={changePageNumber} />
-            </div>
-            <div className="errorDiv">
-                <p>{errorMessage}</p>
-            </div>
-            <div className="canvasDiv">
+            <div className="canvasDiv" style={{ '--tv-left': `${canvasHeight.current * 540 / 2790}px`, '--tv-right': `${canvasHeight.current * 1080 / 2790}px`, '--tv-left-width': `${canvasHeight.current * 1170 / 2790}px`, '--tv-right-width': `${canvasHeight.current * 1710 / 2790}px`, '--tv-center': `${canvasHeight.current * 270 / 2790}px`, transform: `translateX(${-canvasHeight.current * 270 / 2790}px)` }}>
+                <div className="pageNumberDiv">
+                    <input type="number" id="pageNumberInput" name="pageNumberInput" min="1" max="100000" defaultValue={currentPage.current} onChange={changePageNumber} />
+                </div>
                 <canvas className="teleCanvas" width={canvasWidth.current} height={canvasHeight.current} ref={canvasRef}></canvas>
+                <div className="errorDiv" role="status">{errorMessage}</div>
             </div>
         </div>
     );
