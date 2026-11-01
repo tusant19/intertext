@@ -26,6 +26,21 @@
     z-index: 1;
 }
 
+.pageNumberDiv input {
+    width: 5ch;
+    padding: 1px 4px 2px;
+    border: 1px solid #56342f;
+    border-radius: 4px;
+    outline: 0;
+    appearance: textfield;
+    background: #8a4e45;
+    color: #f3dfa9;
+    font: clamp(12px, 1.5vw, 20px) 'VT323', monospace;
+    text-align: center;
+}
+
+.pageNumberDiv input::-webkit-inner-spin-button { appearance: none; }
+
 .errorDiv {
     position: absolute;
     top: calc(110.753% + 8px);

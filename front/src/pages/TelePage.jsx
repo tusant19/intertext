@@ -142,7 +142,7 @@ function TelePage() {
     }, [currentPage.current]);
 
     if (window.innerWidth < 700) {
-        canvasWidth.current = Math.min(window.innerWidth * 0.95 / (1 + 0.78 * 1620 / 2790), window.innerHeight * 0.7 / (0.78 * 3390 / 2790));
+        canvasWidth.current = window.innerWidth * 0.95;
         canvasHeight.current = canvasWidth.current / columns * rows * 1.3;
         cellWidth.current = canvasWidth.current / columns;
         cellHeight.current = canvasHeight.current / rows;
@@ -229,7 +229,7 @@ function TelePage() {
     
     function handleResize() {
         if (window.innerWidth < 700) {
-            canvasWidth.current = Math.min(window.innerWidth * 0.95 / (1 + 0.78 * 1620 / 2790), window.innerHeight * 0.7 / (0.78 * 3390 / 2790));
+            canvasWidth.current = window.innerWidth * 0.95;
             canvasHeight.current = canvasWidth.current / columns * rows * 1.3;
             cellWidth.current = canvasWidth.current / columns;
             cellHeight.current = canvasHeight.current / rows;
