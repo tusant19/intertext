@@ -56,9 +56,9 @@
     top: -10.753%;
     width: calc(100% + var(--tv-left) + var(--tv-right));
     height: 121.505%;
-    background: url('../assets/tvleft.png') left center / var(--tv-left-width) 100% no-repeat,
-                url('../assets/tvmiddle.png') var(--tv-left-width) center / calc(100% - var(--tv-left-width) - var(--tv-right-width)) 100% no-repeat,
-                url('../assets/tvright.png') right center / var(--tv-right-width) 100% no-repeat;
+    background: var(--tv-left-image) left center / var(--tv-left-width) 100% no-repeat,
+                var(--tv-middle-image) var(--tv-left-width) center / calc(100% - var(--tv-left-width) - var(--tv-right-width)) 100% no-repeat,
+                var(--tv-right-image) right center / var(--tv-right-width) 100% no-repeat;
     image-rendering: pixelated;
 }
 
@@ -66,7 +66,7 @@
     .canvasDiv::before {
         left: calc((100vw - 100%) / -2);
         width: 100vw;
-        background: url('../assets/tvmiddle.png') center / 100% 100% no-repeat;
+        background: var(--tv-middle-image) center / 100% 100% no-repeat;
     }
 
     .pageNumberDiv { left: 50%; }
@@ -92,6 +92,19 @@
     align-items: center;
     justify-content: center;
     height: 100%;
+}
+
+.coinsDisplay p {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 0 0 12px;
+}
+
+.coinsDisplay img {
+    height: 30px;
+    width: auto;
+    image-rendering: pixelated;
 }
 
 .toolButton {

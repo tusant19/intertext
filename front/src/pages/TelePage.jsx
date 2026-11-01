@@ -6,6 +6,10 @@ import apiAdress from "../components/apiAdress.js";
 import { io } from "socket.io-client";
 import '@fontsource/vt323';
 import { useState } from "react";
+import coinImage from "../assets/coin.png";
+import tvLeftImage from "../assets/tvleft.png";
+import tvMiddleImage from "../assets/tvmiddle.png";
+import tvRightImage from "../assets/tvright.png";
 
 function TelePage() {
     const rows = 24;
@@ -677,7 +681,7 @@ function TelePage() {
             <div className="movingHighlightDiv" ref={movingHighlightRef}></div>
             <div className="toolBarDiv">
                 <div className="coinsDisplay">
-                    <p>Insert image here {coins}</p>
+                    <p><img src={coinImage} alt="Coin" /> {coins}</p>
                 </div>
                 <div className="toolDiv">
                     <div className="textWriteToolDiv">
@@ -700,7 +704,7 @@ function TelePage() {
                 <p>Background Color</p>
                 <input type="color" id="bgColorPicker" name="bgColorPicker" value={currentBgColor.current} onChange={handleBgColorChange}/>
             </div>
-            <div className="canvasDiv" style={{ '--tv-left': `${canvasHeight.current * 540 / 2790}px`, '--tv-right': `${canvasHeight.current * 1080 / 2790}px`, '--tv-left-width': `${canvasHeight.current * 1170 / 2790}px`, '--tv-right-width': `${canvasHeight.current * 1710 / 2790}px`, '--tv-center': `${canvasHeight.current * 270 / 2790}px`, transform: window.innerWidth < 700 ? 'none' : `translateX(${-canvasHeight.current * 270 / 2790}px)` }}>
+            <div className="canvasDiv" style={{ '--tv-left': `${canvasHeight.current * 540 / 2790}px`, '--tv-right': `${canvasHeight.current * 1080 / 2790}px`, '--tv-left-width': `${canvasHeight.current * 1170 / 2790}px`, '--tv-right-width': `${canvasHeight.current * 1710 / 2790}px`, '--tv-center': `${canvasHeight.current * 270 / 2790}px`, '--tv-left-image': `url(${tvLeftImage})`, '--tv-middle-image': `url(${tvMiddleImage})`, '--tv-right-image': `url(${tvRightImage})`, transform: window.innerWidth < 700 ? 'none' : `translateX(${-canvasHeight.current * 270 / 2790}px)` }}>
                 <div className="pageNumberDiv">
                     <input type="number" id="pageNumberInput" name="pageNumberInput" min="1" max="100000" defaultValue={currentPage.current} onChange={changePageNumber} />
                 </div>

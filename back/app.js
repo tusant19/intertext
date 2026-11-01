@@ -4,18 +4,20 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import Database from 'better-sqlite3'
 import { Server } from 'socket.io';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
+process.loadEnvFile(join(dirname(fileURLToPath(import.meta.url)), '.env'));
 const db = new Database('database.db');
+const corsOptions = { origin: (process.env.ALLOWED_CORS_ORIGINS ?? '').split(',').filter(Boolean) };
 
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: {
-    origin: '*',
-  }
+  cors: corsOptions
 });
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 db.exec(`
