@@ -384,6 +384,7 @@ function TelePage() {
         }
 
         window.addEventListener("keydown", handleKeyPress);
+        return () => window.removeEventListener("keydown", handleKeyPress);
     }, []);
 
     //handle key press for clear tool
