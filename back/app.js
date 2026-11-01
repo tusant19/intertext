@@ -6,6 +6,7 @@ import Database from 'better-sqlite3'
 import { Server } from 'socket.io';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { rateLimit } from 'express-rate-limit'
 
 process.loadEnvFile(join(dirname(fileURLToPath(import.meta.url)), '.env'));
 const db = new Database('database.db');
@@ -16,6 +17,14 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: corsOptions
 });
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 180, // limit each IP to 180 requests per windowMs
+  message: 'Too many requests within a minute, please try again later.',
+});
+
+app.use(limiter);
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());

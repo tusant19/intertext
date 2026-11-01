@@ -24,6 +24,7 @@ function TelePage() {
     const [, setCanvasSizeVersion] = useState(0);
     const movingHighlightRef = useRef(null);
     const canvasRef = useRef(null);
+    const mobileKeyboardInputRef = useRef(null);
     const clickedCell = useRef({ x: null, y: null });
     const textToolActive = useRef(false);
     const charColorToolActive = useRef(false);
@@ -271,7 +272,7 @@ function TelePage() {
                 }
                 return prevCoins;
             });
-        }, 50);
+        }, 1000);
 
         return () => {
             clearInterval(interval);
@@ -676,6 +677,10 @@ function TelePage() {
         }, 5000);
     }
 
+    function openMobileKeyboard() {
+        mobileKeyboardInputRef.current?.focus({ preventScroll: true });
+    }
+
     return (
         <div className="telePageMain">
             <div className="movingHighlightDiv" ref={movingHighlightRef}></div>
@@ -702,6 +707,8 @@ function TelePage() {
                 <label className="colorControl">Text <input type="color" id="charColorPicker" name="charColorPicker" value={currentCharColor.current} onChange={handleCharColorChange} /></label>
                 <label className="colorControl">Background <input type="color" id="bgColorPicker" name="bgColorPicker" value={currentBgColor.current} onChange={handleBgColorChange}/></label>
             </div>
+            <input className="mobileKeyboardInput" ref={mobileKeyboardInputRef} type="text" inputMode="text" tabIndex="-1" onInput={(event) => { event.target.value = ""; }} />
+            <button className="mobileKeyboardButton" type="button" aria-label="Open keyboard" onClick={openMobileKeyboard}>⌨</button>
             <div className="canvasDiv" style={{ '--tv-left': `${canvasHeight.current * 540 / 2790}px`, '--tv-right': `${canvasHeight.current * 1080 / 2790}px`, '--tv-left-width': `${canvasHeight.current * 1170 / 2790}px`, '--tv-right-width': `${canvasHeight.current * 1710 / 2790}px`, '--tv-center': `${canvasHeight.current * 270 / 2790}px`, '--tv-left-image': `url(${tvLeftImage})`, '--tv-middle-image': `url(${tvMiddleImage})`, '--tv-right-image': `url(${tvRightImage})`, transform: window.innerWidth < 700 ? 'none' : `translateX(${-canvasHeight.current * 270 / 2790}px)` }}>
                 <div className="pageNumberDiv">
                     <input type="number" id="pageNumberInput" name="pageNumberInput" min="1" max="100000" defaultValue={currentPage.current} onChange={changePageNumber} />
