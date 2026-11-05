@@ -11,6 +11,7 @@
 <li>npm install</li>
 <li>npm run dev</li>
 </ul>
+<p>You also have to add a .env file in the back folder with ALLOWED_CORS_ORIGINS=http://localhost:5173, etc. </p>
 
 <h2>How it works:</h2>
 <p>The site is a canvas with a 40 wide 24 tall grid of cells meant to imitate the look of teletext</p>
